@@ -1,4 +1,4 @@
-package org.masouras;
+package org.masouras.config;
 
 import lombok.Getter;
 
