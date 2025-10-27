@@ -1,4 +1,4 @@
-package org.masouras.data;
+package org.masouras.data.service;
 
 import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
