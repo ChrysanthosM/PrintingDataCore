@@ -10,18 +10,28 @@
   <name>PrintingDataCore</name>
   <url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>23</maven.compiler.source>
-    <maven.compiler.target>23</maven.compiler.target>
-  </properties>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
+        <maven.compiler.compilerArgs>--enable-preview</maven.compiler.compilerArgs>
+    </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -73,17 +83,5 @@
     </dependency>
 
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>23</source>
-          <target>23</target>
-          <compilerArgs>--enable-preview</compilerArgs>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
 </project>
