@@ -14,7 +14,7 @@ import java.util.Base64;
 @Slf4j
 public class FileOnDiscActions {
 
-    @Cacheable
+    @Cacheable(value = "getRelevantFile", key = "#okFile.getAbsolutePath().concat('-').concat(#fileExtensionType.name())", condition = "#okFile != null")
     public File getRelevantFile(File okFile, FileExtensionType fileExtensionType) {
         String baseName = Files.getNameWithoutExtension(okFile.getName());
         return new File(okFile.getParentFile(), baseName + "." + fileExtensionType.getExtension());
