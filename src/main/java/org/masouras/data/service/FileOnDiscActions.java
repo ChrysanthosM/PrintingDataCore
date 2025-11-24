@@ -3,7 +3,7 @@ package org.masouras.data.service;
 import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.config.FileExtensionType;
-import org.springframework.cache.annotation.Cacheable;
+import org.masouras.data.control.OneTimeCache;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -13,11 +13,15 @@ import java.util.Base64;
 @Service
 @Slf4j
 public class FileOnDiscActions {
+    private final OneTimeCache<String, File> oneTimeCache = new OneTimeCache<>();
 
     public File getRelevantFile(File okFile, FileExtensionType fileExtensionType) {
-        String baseName = Files.getNameWithoutExtension(okFile.getName());
-        return new File(okFile.getParentFile(), baseName + "." + fileExtensionType.getExtension());
+        return oneTimeCache.computeOrGetOnce(okFile.getAbsolutePath(), () -> {
+            String baseName = Files.getNameWithoutExtension(okFile.getName());
+            return new File(okFile.getParentFile(), baseName + "." + fileExtensionType.getExtension());
+        });
     }
+
 
     public String getContentBase64(File fromFile) {
         try {
