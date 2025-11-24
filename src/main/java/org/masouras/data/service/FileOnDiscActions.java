@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.config.FileExtensionType;
 import org.masouras.data.control.OneTimeCache;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -13,7 +14,12 @@ import java.util.Base64;
 @Service
 @Slf4j
 public class FileOnDiscActions {
-    private final OneTimeCache<String, File> oneTimeCache = new OneTimeCache<>();
+    private final OneTimeCache<String, File> oneTimeCache;
+
+    @Autowired
+    public FileOnDiscActions(OneTimeCache<String, File> oneTimeCache) {
+        this.oneTimeCache = oneTimeCache;
+    }
 
     public File getRelevantFile(File okFile, FileExtensionType fileExtensionType) {
         return oneTimeCache.computeOrGetOnce(okFile.getAbsolutePath(), () -> {
