@@ -19,7 +19,6 @@ public class FileOnDBActions {
         this.activityRepository = activityRepository;
     }
 
-    @Transactional
     public Long createActivity() {
         ActivityEntity activity = new ActivityEntity();
         activity.setActivityType("10001");
