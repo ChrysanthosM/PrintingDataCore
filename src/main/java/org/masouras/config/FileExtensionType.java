@@ -1,15 +1,16 @@
 package org.masouras.config;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.masouras.printing.sqlite.schema.control.ActivityType;
 
+@RequiredArgsConstructor
+@Getter
 public enum FileExtensionType {
-    XML("xml"),
+    XML("xml", ActivityType.NEW_ENTRY_XML),
     ;
 
-    @Getter
     private final String extension;
-    FileExtensionType(String extension) {
-        this.extension = extension;
-    }
+    private final ActivityType activityType;
 
 }
