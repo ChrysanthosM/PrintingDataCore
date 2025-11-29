@@ -1,31 +1,32 @@
 package org.masouras.data.service;
 
 import com.google.common.io.Files;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.config.FileExtensionType;
-import org.masouras.data.control.OneTimeCache;
+import org.masouras.data.control.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Slf4j
 public class FileOnDiscActions {
-    private final OneTimeCache<String, File> oneTimeCache;
+    private final CsvParser csvParser;
 
     @Autowired
-    public FileOnDiscActions(OneTimeCache<String, File> oneTimeCache) {
-        this.oneTimeCache = oneTimeCache;
+    public FileOnDiscActions(CsvParser csvParser) {
+        this.csvParser = csvParser;
     }
 
     public File getRelevantFile(File okFile, FileExtensionType fileExtensionType) {
-        return oneTimeCache.computeOrGetOnce(okFile.getAbsolutePath(), () -> {
-            String baseName = Files.getNameWithoutExtension(okFile.getName());
-            return new File(okFile.getParentFile(), baseName + "." + fileExtensionType.getExtension());
-        });
+        String baseName = Files.getNameWithoutExtension(okFile.getName());
+        return new File(okFile.getParentFile(), baseName + "." + fileExtensionType.getExtension());
     }
 
 
@@ -38,10 +39,18 @@ public class FileOnDiscActions {
         }
     }
 
-    public void deleteFile(File file) {
-        boolean fileDeleted = file.delete();
+    public void deleteFile(@NonNull File file) {
+        boolean fileDeleted = file.exists() && file.isFile() && file.delete();
         if (log.isDebugEnabled()) log.debug("{} file deleted:{}", file.getName(), fileDeleted);
         if (!fileDeleted && log.isWarnEnabled()) log.warn("{} file NOT deleted:", file.getName());
     }
 
+    public <T> List<T> getCsvContent(@NonNull Class<T> type, @NonNull File fromFile, @NonNull CsvParser.DelimiterType delimiterType) {
+        try {
+            return csvParser.parseFile(type, fromFile, delimiterType);
+        } catch (Exception e) {
+            log.error("Failed to parseFile: {}", fromFile.getAbsolutePath(), e);
+            return Collections.emptyList();
+        }
+    }
 }
