@@ -3,8 +3,8 @@ package org.masouras.data.service;
 import com.google.common.io.Files;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.config.FileExtensionType;
 import org.masouras.data.control.CsvParser;
+import org.masouras.data.domain.FileOkDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +24,9 @@ public class FileOnDiscActions {
         this.csvParser = csvParser;
     }
 
-    public File getRelevantFile(File okFile, FileExtensionType fileExtensionType) {
+    public File getRelevantFile(File okFile, FileOkDto fileOkDto) {
         String baseName = Files.getNameWithoutExtension(okFile.getName());
-        return new File(okFile.getParentFile(), baseName + "." + fileExtensionType.getExtension());
+        return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().getExtension());
     }
 
 
