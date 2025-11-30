@@ -1,9 +1,9 @@
 package org.masouras.data.domain;
 
 import lombok.Data;
-import org.masouras.config.FileExtensionType;
-import org.masouras.printing.sqlite.schema.control.ActivityType;
-import org.masouras.printing.sqlite.schema.control.ContentType;
+import org.masouras.data.control.FileExtensionType;
+import org.masouras.printing.sqlite.schema.jpa.control.ActivityType;
+import org.masouras.printing.sqlite.schema.jpa.control.ContentType;
 
 @Data
 public class FileOkDto {

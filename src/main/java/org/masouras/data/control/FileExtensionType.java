@@ -1,4 +1,4 @@
-package org.masouras.config;
+package org.masouras.data.control;
 
 import jakarta.annotation.Nullable;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package org.masouras.data.service;
+package org.masouras.data.boundary;
 
 import com.google.common.io.Files;
 import lombok.NonNull;
