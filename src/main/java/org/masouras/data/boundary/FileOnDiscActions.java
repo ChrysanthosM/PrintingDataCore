@@ -1,8 +1,8 @@
 package org.masouras.data.boundary;
 
-import com.google.common.io.Files;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import org.masouras.data.control.CsvParser;
 import org.masouras.data.control.FileExtensionType;
@@ -13,6 +13,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -32,18 +33,19 @@ public class FileOnDiscActions {
     }
 
     public File getRelevantFile(File okFile, FileOkDto fileOkDto) {
-        String baseName = Files.getNameWithoutExtension(okFile.getName());
+        String baseName = FilenameUtils.removeExtension(okFile.getName());
         return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().getExtension());
     }
     public List<String> getPossibleRelevantFileNames(@NonNull File okFile) {
-        String baseName = Files.getNameWithoutExtension(okFile.getName());
-        return Arrays.stream(FileExtensionType.values()).map(ext -> baseName + "." + ext.getExtension().toLowerCase()).toList();
+        return Arrays.stream(FileExtensionType.values())
+                .map(ext -> new File(okFile.getParent(), FilenameUtils.removeExtension(okFile.getName()) + "." + ext.getExtension().toLowerCase()).getAbsolutePath())
+                .toList();
     }
 
 
     public String getContentBase64(File fromFile) {
         try {
-            return Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(fromFile.toPath()));
+            return Base64.getEncoder().encodeToString(Files.readAllBytes(fromFile.toPath()));
         } catch (IOException e) {
             log.error("Failed to read relevant File: {}", fromFile.getAbsolutePath(), e);
             return null;
@@ -80,10 +82,10 @@ public class FileOnDiscActions {
     private boolean ensureFolderExists(String toPath) {
         try {
             Path targetDir = Paths.get(toPath);
-            if (!java.nio.file.Files.exists(targetDir)) {
-                java.nio.file.Files.createDirectories(targetDir);
+            if (!Files.exists(targetDir)) {
+                Files.createDirectories(targetDir);
             }
-            return java.nio.file.Files.isDirectory(targetDir);
+            return Files.isDirectory(targetDir);
         } catch (IOException e) {
             log.error("Error creating folder for '{}'", toPath, e);
             return false;
@@ -100,7 +102,9 @@ public class FileOnDiscActions {
             return;
         }
         try {
-            java.nio.file.Files.move(file.toPath(), Paths.get(moveToPath), StandardCopyOption.REPLACE_EXISTING);
+            Path target = Paths.get(moveToPath).resolve(file.getName());
+            Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+            log.info("Moved file '{}' to '{}'", file.getAbsolutePath(), target.toAbsolutePath());
         } catch (IOException e) {
             log.error("Error moving file from '{}' to '{}'", file.toPath(), moveToPath, e);
         }
