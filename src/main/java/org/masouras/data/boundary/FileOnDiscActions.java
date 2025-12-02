@@ -3,7 +3,6 @@ package org.masouras.data.boundary;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
 import org.masouras.data.control.CsvParser;
 import org.masouras.data.control.FileExtensionType;
 import org.masouras.data.domain.FileOkDto;
@@ -32,11 +31,11 @@ public class FileOnDiscActions {
         this.csvParser = csvParser;
     }
 
-    public File getRelevantFile(File okFile, FileOkDto fileOkDto) {
+    public @NonNull File getRelevantFile(File okFile, FileOkDto fileOkDto) {
         String baseName = FilenameUtils.removeExtension(okFile.getName());
         return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().getExtension());
     }
-    public List<String> getPossibleRelevantFileNames(@NonNull File okFile) {
+    public List<String> getPossibleRelevantFileNames(File okFile) {
         return Arrays.stream(FileExtensionType.values())
                 .map(ext -> new File(okFile.getParent(), FilenameUtils.removeExtension(okFile.getName()) + "." + ext.getExtension().toLowerCase()).getAbsolutePath())
                 .toList();
@@ -52,13 +51,13 @@ public class FileOnDiscActions {
         }
     }
 
-    public void deleteFile(@NonNull File file) {
+    public void deleteFile(File file) {
         boolean fileDeleted = file.exists() && file.isFile() && file.delete();
         if (log.isDebugEnabled()) log.debug("{} file deleted:{}", file.getName(), fileDeleted);
         if (!fileDeleted && log.isWarnEnabled()) log.warn("{} file NOT deleted:", file.getName());
     }
 
-    public void copyFile(@NonNull File file, String toPath) {
+    public void copyFile(File file, String toPath) {
         if (!ensureFolderExists(toPath)) {
             if (log.isWarnEnabled()) {
                 log.warn("Folder NOT exists/created : '{}'", toPath);
@@ -70,7 +69,7 @@ public class FileOnDiscActions {
         if (log.isDebugEnabled()) log.debug("{} file copied:{}", file.getName(), fileCopied);
         if (!fileCopied && log.isWarnEnabled()) log.warn("{} file NOT copied:", file.getName());
     }
-    private boolean fileCopyMain(@NotNull File file, String toPath) {
+    private boolean fileCopyMain(File file, String toPath) {
         try {
             FileCopyUtils.copy(file, new File(toPath, file.getName()));
             return true;
@@ -92,7 +91,7 @@ public class FileOnDiscActions {
         }
     }
 
-    public void moveFile(@NonNull File file, String moveToPath) {
+    public void moveFile(File file, String moveToPath) {
         if (!ensureFolderExists(moveToPath)) {
             if (log.isWarnEnabled()) {
                 log.warn("Folder NOT exists/created : '{}'", moveToPath);
@@ -110,7 +109,7 @@ public class FileOnDiscActions {
         }
     }
 
-    public <T> List<T> getCsvContent(@NonNull Class<T> type, @NonNull File fromFile, @NonNull CsvParser.DelimiterType delimiterType) {
+    public <T> List<T> getCsvContent(@NonNull Class<T> type, @NonNull CsvParser.DelimiterType delimiterType, File fromFile) {
         try {
             return csvParser.parseFile(type, fromFile, delimiterType);
         } catch (Exception e) {
