@@ -1,5 +1,6 @@
 package org.masouras.trace.annotation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -8,26 +9,16 @@ import org.masouras.trace.scheduler.SpanInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Aspect
 @Component
 public class TracingAspect {
-//    private @Autowired Tracer tracer;
-
-//    @Around("@annotation(Traceable)")
-//    public Object traceMethod(ProceedingJoinPoint joinPoint) throws Throwable {
-//        String spanName = joinPoint.getSignature().toShortString();
-//        Span span = tracer.spanBuilder(spanName).startSpan();
-//        try {
-//            return joinPoint.proceed();
-//        } finally {
-//            span.end();
-//        }
-//    }
-
     private final SpanInfoManager spanInfoManager;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public TracingAspect(SpanInfoManager spanInfoManager) {
@@ -40,20 +31,45 @@ public class TracingAspect {
                 .spanName(joinPoint.getSignature().toShortString())
                 .timestamp(System.currentTimeMillis())
                 .methodName(joinPoint.getSignature().getName())
-                .parameters(Arrays.stream(joinPoint.getArgs()).map(Object::toString).collect(Collectors.joining(", ")))
+                .parameters(serializeArgs(joinPoint.getArgs()))
                 .build();
-
         try {
             Object result = joinPoint.proceed();
-            spanInfo.setResult(result != null ? result.toString() : null);
+            spanInfo.setResult(serializeResult(result));
             return result;
         } catch (Throwable throwable) {
-            spanInfo.setError(throwable.getMessage());
+            spanInfo.setError(serializeError(throwable));
             throw throwable;
         } finally {
             spanInfoManager.addSpanInfo(spanInfo);
         }
     }
+
+    private String serializeArgs(Object[] args) {
+        try {
+            return objectMapper.writeValueAsString(args);
+        } catch (Exception e) {
+            return Arrays.stream(args)
+                    .map(arg -> arg != null ? arg.toString() : "null")
+                    .collect(Collectors.joining(", "));
+        }
+    }
+
+    private String serializeResult(Object result) {
+        if (result == null) return null;
+        try {
+            return objectMapper.writeValueAsString(result);
+        } catch (Exception e) {
+            return result.toString();
+        }
+    }
+
+    private String serializeError(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
+
 }
 
 
