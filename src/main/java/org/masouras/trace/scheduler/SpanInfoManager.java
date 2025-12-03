@@ -65,9 +65,6 @@ public class SpanInfoManager {
         } else {
             if (log.isWarnEnabled()) log.warn("MongoDB not available, skipping save");
         }
-
-        spanInfoRepository.saveAll(spanInfos);
-        spanInfoQueue.removeAll(spanInfos);
     }
     private boolean isMongoAvailable() {
         try {
