@@ -2,12 +2,12 @@ package org.masouras.data.boundary;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.printing.mssql.schema.jpa.control.ActivityType;
-import org.masouras.printing.mssql.schema.jpa.control.ContentType;
-import org.masouras.printing.mssql.schema.jpa.entity.ActivityEntity;
-import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
-import org.masouras.printing.mssql.schema.jpa.repository.ActivityRepository;
-import org.masouras.printing.mssql.schema.jpa.repository.PrintingDataRepository;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.squad.printing.mssql.schema.jpa.repository.ActivityRepository;
+import org.masouras.squad.printing.mssql.schema.jpa.repository.PrintingDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

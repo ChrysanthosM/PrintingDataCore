@@ -3,8 +3,8 @@ package org.masouras.data.control;
 import lombok.experimental.UtilityClass;
 import org.masouras.data.domain.FileOkDto;
 import org.masouras.data.domain.FileOkRaw;
-import org.masouras.printing.mssql.schema.jpa.control.ActivityType;
-import org.masouras.printing.mssql.schema.jpa.control.ContentType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 
 @UtilityClass
 public class FileOkAdapter {
