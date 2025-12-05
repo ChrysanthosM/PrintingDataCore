@@ -7,7 +7,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.masouras.trace.domain.SpanInfo;
 import org.masouras.trace.scheduler.SpanInfoManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,8 +17,12 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Aspect
-@Component
+@Configuration
+@ConditionalOnProperty(name = "spring.data.mongodb.uri")
 public class TracingAspect {
+    @Value("${spring.data.mongodb.uri:null}")
+    private String connectionString;
+
     private final SpanInfoManager spanInfoManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
 

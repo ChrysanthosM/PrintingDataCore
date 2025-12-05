@@ -6,6 +6,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,10 +15,11 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class MongoConfig {
-    @Value("${spring.data.mongodb.uri}")
+    @Value("${spring.data.mongodb.uri:null}")
     private String connectionString;
 
     @Bean
+    @ConditionalOnProperty(name = "spring.data.mongodb.uri")
     public MongoClient mongoClient() {
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
@@ -30,6 +32,7 @@ public class MongoConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "spring.data.mongodb.uri")
     public MongoTemplate mongoTemplate(MongoClient mongoClient) {
         String dbName = new ConnectionString(connectionString).getDatabase();
         Preconditions.checkNotNull(dbName);
