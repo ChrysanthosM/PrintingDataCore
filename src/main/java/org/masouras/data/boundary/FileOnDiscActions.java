@@ -41,7 +41,6 @@ public class FileOnDiscActions {
                 .toList();
     }
 
-
     public String getContentBase64(File fromFile) {
         try {
             return Base64.getEncoder().encodeToString(Files.readAllBytes(fromFile.toPath()));
