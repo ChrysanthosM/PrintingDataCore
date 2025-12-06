@@ -1,11 +1,11 @@
-package org.masouras.trace.scheduler;
+package org.masouras.trace.control.scheduler;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.masouras.trace.control.repository.mongo.SpanInfoRepository;
+import org.masouras.trace.control.repository.SpanInfoMongoRepository;
 import org.masouras.trace.domain.SpanInfo;
-import org.masouras.trace.service.EmailService;
+import org.masouras.trace.control.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,14 +24,14 @@ public class SpanInfoManager {
     private final Queue<SpanInfo> spanInfoQueue = new ConcurrentLinkedDeque<>();
     private final ReentrantLock lock = new ReentrantLock();
 
-    private final SpanInfoRepository spanInfoRepository;
+    private final SpanInfoMongoRepository spanInfoMongoRepository;
     private final MongoTemplate mongoTemplate;
     private final EmailService emailService;
 
 
     @Autowired
-    public SpanInfoManager(SpanInfoRepository spanInfoRepository, MongoTemplate mongoTemplate, EmailService emailService) {
-        this.spanInfoRepository = spanInfoRepository;
+    public SpanInfoManager(SpanInfoMongoRepository spanInfoMongoRepository, MongoTemplate mongoTemplate, EmailService emailService) {
+        this.spanInfoMongoRepository = spanInfoMongoRepository;
         this.mongoTemplate = mongoTemplate;
         this.emailService = emailService;
     }
@@ -60,7 +60,7 @@ public class SpanInfoManager {
         if (CollectionUtils.isEmpty(spanInfos)) return;
 
         if (isMongoAvailable()) {
-            spanInfoRepository.saveAll(spanInfos);
+            spanInfoMongoRepository.saveAll(spanInfos);
             spanInfoQueue.removeAll(spanInfos);
         } else {
             if (log.isWarnEnabled()) log.warn("MongoDB not available, skipping save");
