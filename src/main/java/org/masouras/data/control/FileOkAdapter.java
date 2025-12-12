@@ -10,7 +10,7 @@ import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 public class FileOkAdapter {
     public static FileOkDto toFileOkDto(FileOkRaw fileOkRaw) {
         return new FileOkDto(
-                FileExtensionType.getFromCode(fileOkRaw.getFileExtension()),
+                org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType.getFromCode(fileOkRaw.getFileExtension()),
                 ContentType.getFromCode(fileOkRaw.getContentType()),
                 ActivityType.getFromCode(fileOkRaw.getActivityType())
         );

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.repository.ActivityRepository;
@@ -35,10 +36,12 @@ public class FileOnDBActions {
         return activityRepository.save(activityEntity);
     }
 
-    public Long savePrintingData(ActivityEntity activityEntity, @NonNull ContentType contentType, @NonNull String contentBase64) {
+    public Long savePrintingData(ActivityEntity activityEntity,
+                                 @NonNull ContentType contentType, @NonNull FileExtensionType fileExtensionType, @NonNull String contentBase64) {
         PrintingDataEntity printingDataEntity = new PrintingDataEntity(
                 activityEntity,
                 contentType,
+                fileExtensionType,
                 contentBase64
         );
         return printingDataRepository.save(printingDataEntity).getId();

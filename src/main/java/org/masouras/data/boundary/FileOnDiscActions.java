@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.masouras.data.control.CsvParser;
-import org.masouras.data.control.FileExtensionType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.data.domain.FileOkDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,11 +33,11 @@ public class FileOnDiscActions {
 
     public @NonNull File getRelevantFile(File okFile, FileOkDto fileOkDto) {
         String baseName = FilenameUtils.removeExtension(okFile.getName());
-        return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().getExtension());
+        return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().getCode());
     }
     public List<String> getPossibleRelevantFileNames(File okFile) {
         return Arrays.stream(FileExtensionType.values())
-                .map(ext -> new File(okFile.getParent(), FilenameUtils.removeExtension(okFile.getName()) + "." + ext.getExtension().toLowerCase()).getAbsolutePath())
+                .map(ext -> new File(okFile.getParent(), FilenameUtils.removeExtension(okFile.getName()) + "." + ext.getCode().toLowerCase()).getAbsolutePath())
                 .toList();
     }
 
