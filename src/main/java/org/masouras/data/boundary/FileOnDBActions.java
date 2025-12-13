@@ -47,5 +47,8 @@ public class FileOnDBActions {
         return printingDataRepository.save(printingDataEntity).getId();
     }
 
+    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity) {
+        return printingDataRepository.save(printingDataEntity);
+    }
 }
 
