@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 
 @Service
 @Slf4j
-public class FileOnDBActions {
+public class RepositoryFacade {
     private final ActivityRepository activityRepository;
     private final PrintingDataRepository printingDataRepository;
 
     @Autowired
-    public FileOnDBActions(ActivityRepository activityRepository, PrintingDataRepository printingDataRepository) {
+    public RepositoryFacade(ActivityRepository activityRepository, PrintingDataRepository printingDataRepository) {
         this.activityRepository = activityRepository;
         this.printingDataRepository = printingDataRepository;
     }

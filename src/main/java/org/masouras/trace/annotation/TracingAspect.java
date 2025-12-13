@@ -8,8 +8,8 @@ import io.opentelemetry.context.Scope;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.masouras.trace.domain.SpanInfo;
 import org.masouras.trace.control.scheduler.SpanInfoManager;
+import org.masouras.trace.domain.SpanInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 

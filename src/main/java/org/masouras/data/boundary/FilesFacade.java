@@ -4,14 +4,23 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.masouras.data.control.CsvParser;
-import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.data.domain.FileOkDto;
+import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.w3c.dom.Document;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,11 +32,11 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class FileOnDiscActions {
+public class FilesFacade {
     private final CsvParser csvParser;
 
     @Autowired
-    public FileOnDiscActions(CsvParser csvParser) {
+    public FilesFacade(CsvParser csvParser) {
         this.csvParser = csvParser;
     }
 
@@ -115,5 +124,22 @@ public class FileOnDiscActions {
             log.error("Failed to parseFile: {}", fromFile.getAbsolutePath(), e);
             return Collections.emptyList();
         }
+    }
+
+    public String documentToString(Document doc) throws TransformerException {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        return writer.getBuffer().toString();
+    }
+
+    public String stringDocumentToBase64(String stringDocument) {
+        return Base64.getEncoder().encodeToString(stringDocument.getBytes(StandardCharsets.UTF_8));
     }
 }
