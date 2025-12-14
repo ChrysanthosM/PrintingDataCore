@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.PrintingStatus;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.repository.ActivityRepository;
 import org.masouras.squad.printing.mssql.schema.jpa.repository.PrintingDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -47,8 +49,19 @@ public class RepositoryFacade {
         return printingDataRepository.save(printingDataEntity).getId();
     }
 
-    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity) {
+    @Transactional
+    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, String contentBase64) {
+        printingDataEntity.setContentBase64(contentBase64);
+        printingDataEntity.setPrintingStatus(PrintingStatus.VALIDATED);
         return printingDataRepository.save(printingDataEntity);
     }
+
+    @Transactional
+    public void saveValidationFailed(PrintingDataEntity printingDataEntity, String errorMessage) {
+        printingDataEntity.setErrorMessage(errorMessage);
+        printingDataEntity.setPrintingStatus(PrintingStatus.ERROR);
+        printingDataRepository.save(printingDataEntity);
+    }
+
 }
 
