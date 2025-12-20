@@ -8,7 +8,6 @@ import org.masouras.squad.printing.mssql.schema.jpa.control.PrintingStatus;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingFilesEntity;
-import org.masouras.squad.printing.mssql.schema.jpa.repository.ActivityRepository;
 import org.masouras.squad.printing.mssql.schema.jpa.repository.PrintingDataRepository;
 import org.masouras.squad.printing.mssql.schema.jpa.repository.PrintingFilesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,11 @@ import java.time.LocalDateTime;
 @Service
 @Slf4j
 public class RepositoryFacade {
-    private final ActivityRepository activityRepository;
     private final PrintingDataRepository printingDataRepository;
     private final PrintingFilesRepository printingFilesTable;
 
     @Autowired
-    public RepositoryFacade(ActivityRepository activityRepository, PrintingDataRepository printingDataRepository, PrintingFilesRepository printingFilesTable) {
-        this.activityRepository = activityRepository;
+    public RepositoryFacade(PrintingDataRepository printingDataRepository, PrintingFilesRepository printingFilesTable) {
         this.printingDataRepository = printingDataRepository;
         this.printingFilesTable = printingFilesTable;
     }
