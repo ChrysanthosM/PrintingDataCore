@@ -1,12 +1,12 @@
 package org.masouras.data.boundary;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.masouras.data.control.CsvParser;
+import org.masouras.data.control.converter.CsvParser;
 import org.masouras.data.domain.FileOkDto;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.w3c.dom.Document;
@@ -32,13 +32,9 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FilesFacade {
     private final CsvParser csvParser;
-
-    @Autowired
-    public FilesFacade(CsvParser csvParser) {
-        this.csvParser = csvParser;
-    }
 
     public @NonNull File getRelevantFile(File okFile, FileOkDto fileOkDto) {
         String baseName = FilenameUtils.removeExtension(okFile.getName());

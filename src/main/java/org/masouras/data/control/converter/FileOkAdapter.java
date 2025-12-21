@@ -1,4 +1,4 @@
-package org.masouras.data.control;
+package org.masouras.data.control.converter;
 
 import lombok.experimental.UtilityClass;
 import org.masouras.data.domain.FileOkDto;

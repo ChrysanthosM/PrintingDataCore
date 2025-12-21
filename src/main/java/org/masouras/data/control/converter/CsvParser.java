@@ -1,4 +1,4 @@
-package org.masouras.data.control;
+package org.masouras.data.control.converter;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
