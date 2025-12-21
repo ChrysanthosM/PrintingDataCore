@@ -10,8 +10,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +23,9 @@ public class PrintingLetterSetUpService {
 
     private final AtomicBoolean refreshingNow = new AtomicBoolean(false);
 
-    @Getter
     private volatile List<PrintingLetterSetUpProjectionImplementor> printingLetterSetUpProjectionImplementors = List.of();
+    @Getter
+    private volatile Map<String, Map<String, List<PrintingLetterSetUpProjectionImplementor>>> printingLetterLookUpMap = Map.of();
 
     @PostConstruct
     public void init() {
@@ -36,6 +39,9 @@ public class PrintingLetterSetUpService {
         if (!refreshingNow.compareAndSet(false, true)) return;
         try {
             this.printingLetterSetUpProjectionImplementors = repositoryFacade.getPrintingLetterSetUpProjections();
+            this.printingLetterLookUpMap = this.printingLetterSetUpProjectionImplementors.stream()
+                    .collect(Collectors.groupingBy(row -> row.getActivityType().getCode(),
+                            Collectors.groupingBy(row -> row.getContentType().getCode())));
         } catch (Exception e) {
             log.error("Refresh of PrintingLetterSetUpService failed with message: {}", e.getMessage(), e);
         } finally {
