@@ -1,6 +1,7 @@
 package org.masouras.data.control.render;
 
 import lombok.RequiredArgsConstructor;
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class PdfRendererService {
     private final PdfRendererFactory rendererFactory;
 
-    public byte[] generatePdf(PdfRendererType pdfRendererType, byte[] xml, byte[] xsl) {
-        return rendererFactory.getRenderer(pdfRendererType).generate(xml, xsl);
+    public byte[] generatePdf(RendererType rendererType, byte[] xml, byte[] xsl) {
+        return rendererFactory.getRenderer(rendererType).generate(xml, xsl);
     }
 }

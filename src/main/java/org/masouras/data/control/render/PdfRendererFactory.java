@@ -1,6 +1,7 @@
 package org.masouras.data.control.render;
 
 import lombok.RequiredArgsConstructor;
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -8,12 +9,12 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class PdfRendererFactory {
-    private final Map<PdfRendererType, PdfRenderer> renderers;
+    private final Map<RendererType, PdfRenderer> renderers;
 
-    public PdfRenderer getRenderer(PdfRendererType pdfRendererType) {
-        PdfRenderer renderer = renderers.getOrDefault(pdfRendererType,null);
+    public PdfRenderer getRenderer(RendererType rendererType) {
+        PdfRenderer renderer = renderers.getOrDefault(rendererType,null);
         if (renderer == null) {
-            throw new IllegalArgumentException("Unknown renderer: " + pdfRendererType);
+            throw new IllegalArgumentException("Unknown renderer: " + rendererType);
         }
         return renderer;
     }

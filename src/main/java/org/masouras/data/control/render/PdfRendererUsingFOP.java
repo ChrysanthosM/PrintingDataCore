@@ -4,6 +4,7 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.xmlgraphics.util.MimeConstants;
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 
 import javax.xml.transform.Result;
@@ -20,8 +21,8 @@ import java.io.File;
 @Component
 public class PdfRendererUsingFOP implements PdfRenderer {
     @Override
-    public PdfRendererType getPdfRendererType() {
-        return PdfRendererType.FOP;
+    public RendererType getPdfRendererType() {
+        return RendererType.FOP;
     }
 
     @Override

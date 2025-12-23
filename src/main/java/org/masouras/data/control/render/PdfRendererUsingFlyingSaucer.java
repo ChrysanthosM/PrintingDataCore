@@ -1,5 +1,6 @@
 package org.masouras.data.control.render;
 
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -14,8 +15,8 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class PdfRendererUsingFlyingSaucer implements PdfRenderer {
     @Override
-    public PdfRendererType getPdfRendererType() {
-        return PdfRendererType.FLYING_SAUCER;
+    public RendererType getPdfRendererType() {
+        return RendererType.FLYING_SAUCER;
     }
 
     @Override

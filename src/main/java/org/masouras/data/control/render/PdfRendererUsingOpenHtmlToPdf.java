@@ -1,6 +1,7 @@
 package org.masouras.data.control.render;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 
 import javax.xml.transform.Transformer;
@@ -14,8 +15,8 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class PdfRendererUsingOpenHtmlToPdf implements PdfRenderer {
     @Override
-    public PdfRendererType getPdfRendererType() {
-        return PdfRendererType.OPEN_HTML_TO_PDF;
+    public RendererType getPdfRendererType() {
+        return RendererType.OPEN_HTML_TO_PDF;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.masouras.data.control.render;
 
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.openpdf.text.Document;
 import org.openpdf.text.Paragraph;
 import org.openpdf.text.pdf.PdfWriter;
@@ -16,8 +17,8 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class PdfRendererUsingOpenPdf implements PdfRenderer {
     @Override
-    public PdfRendererType getPdfRendererType() {
-        return PdfRendererType.OPEN_PDF;
+    public RendererType getPdfRendererType() {
+        return RendererType.OPEN_PDF;
     }
 
     @Override
