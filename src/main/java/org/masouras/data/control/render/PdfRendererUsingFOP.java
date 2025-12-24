@@ -5,7 +5,7 @@ import org.apache.xmlgraphics.util.MimeConstants;
 import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 
-import javax.xml.transform.*;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
