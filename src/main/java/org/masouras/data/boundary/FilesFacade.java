@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.masouras.data.control.converter.CsvParser;
 import org.masouras.data.domain.FileOkDto;
-import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.FileExtensionType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.w3c.dom.Document;

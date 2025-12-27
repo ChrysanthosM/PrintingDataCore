@@ -1,6 +1,6 @@
 package org.masouras.data.control.render;
 
-import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
+import org.masouras.model.mssql.schema.jpa.control.RendererType;
 import org.openpdf.text.Document;
 import org.openpdf.text.Paragraph;
 import org.openpdf.text.pdf.PdfWriter;

@@ -1,7 +1,7 @@
 package org.masouras.data.control.render;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
+import org.masouras.model.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 
 import javax.xml.transform.TransformerFactory;

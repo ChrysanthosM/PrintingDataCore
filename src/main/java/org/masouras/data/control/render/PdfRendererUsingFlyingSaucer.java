@@ -1,6 +1,6 @@
 package org.masouras.data.control.render;
 
-import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
+import org.masouras.model.mssql.schema.jpa.control.RendererType;
 import org.springframework.stereotype.Component;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
