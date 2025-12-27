@@ -1,6 +1,5 @@
 package org.masouras.trace.annotation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
@@ -12,6 +11,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.masouras.trace.control.scheduler.SpanInfoManager;
 import org.masouras.trace.domain.SpanInfo;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
