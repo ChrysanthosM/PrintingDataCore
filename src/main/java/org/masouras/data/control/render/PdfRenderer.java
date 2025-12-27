@@ -1,6 +1,6 @@
 package org.masouras.data.control.render;
 
-import org.masouras.model.mssql.schema.jpa.control.RendererType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 
 public interface PdfRenderer {
     RendererType getPdfRendererType();

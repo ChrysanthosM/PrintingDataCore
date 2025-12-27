@@ -2,7 +2,7 @@ package org.masouras.data.control.render;
 
 import org.apache.fop.apps.FopFactory;
 import org.apache.xmlgraphics.util.MimeConstants;
-import org.masouras.model.mssql.schema.jpa.control.RendererType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.stereotype.Component;
 
 import javax.xml.transform.TransformerFactory;

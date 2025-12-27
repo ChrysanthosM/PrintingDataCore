@@ -4,8 +4,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.data.boundary.RepositoryFacade;
-import org.masouras.model.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
+import org.masouras.model.mssql.schema.jpa.boundary.PrintingOptionsService;
+import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class PrintingLetterSetUpService {
-    private final RepositoryFacade repositoryFacade;
+    private final PrintingOptionsService printingOptionsService;
 
     private final AtomicBoolean refreshingNow = new AtomicBoolean(false);
 
@@ -38,7 +38,7 @@ public class PrintingLetterSetUpService {
     public synchronized void refresh() {
         if (!refreshingNow.compareAndSet(false, true)) return;
         try {
-            this.printingLetterSetUpProjectionImplementors = repositoryFacade.getPrintingLetterSetUpProjections();
+            this.printingLetterSetUpProjectionImplementors = printingOptionsService.getPrintingLetterSetUpProjections();
             this.printingLetterLookUpMap = this.printingLetterSetUpProjectionImplementors.stream()
                     .collect(Collectors.groupingBy(row -> row.getActivityType().getCode(),
                             Collectors.groupingBy(row -> row.getContentType().getCode())));

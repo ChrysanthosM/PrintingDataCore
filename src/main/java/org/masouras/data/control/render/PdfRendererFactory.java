@@ -1,7 +1,7 @@
 package org.masouras.data.control.render;
 
 import lombok.RequiredArgsConstructor;
-import org.masouras.model.mssql.schema.jpa.control.RendererType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

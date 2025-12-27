@@ -3,34 +3,25 @@ package org.masouras.data.boundary;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.NativeQuery;
-import org.masouras.data.control.util.RepositoryUtils;
 import org.masouras.data.domain.FileOkDto;
-import org.masouras.model.mssql.repo.PrintingOptionsRepo;
-import org.masouras.model.mssql.repo.PrintingOptionsSQL;
-import org.masouras.model.mssql.schema.jpa.control.ActivityType;
-import org.masouras.model.mssql.schema.jpa.control.PrintingStatus;
-import org.masouras.model.mssql.schema.jpa.entity.ActivityEntity;
-import org.masouras.model.mssql.schema.jpa.entity.PrintingDataEntity;
-import org.masouras.model.mssql.schema.jpa.entity.PrintingFilesEntity;
-import org.masouras.model.mssql.schema.jpa.mapper.PrintingLetterSetUpMapper;
-import org.masouras.model.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
-import org.masouras.model.mssql.schema.jpa.repository.PrintingDataRepository;
-import org.masouras.model.mssql.schema.jpa.repository.PrintingFilesRepository;
+import org.masouras.model.mssql.schema.jpa.boundary.PrintingDataService;
+import org.masouras.model.mssql.schema.jpa.boundary.PrintingFilesService;
+import org.masouras.model.mssql.schema.jpa.control.entity.ActivityEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.PrintingFilesEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class RepositoryFacade {
-    private final PrintingDataRepository printingDataRepository;
-    private final PrintingFilesRepository printingFilesTable;
-    private final PrintingOptionsSQL printingOptionsSQL;
+    private final PrintingDataService printingDataService;
+    private final PrintingFilesService printingFilesService;
 
     @Transactional
     public Long saveInitialPrintingData(FileOkDto fileOkDto, @NonNull String initialContentBase65) {
@@ -42,11 +33,11 @@ public class RepositoryFacade {
                 fileOkDto.getFileExtensionType(),
                 printingFilesEntity
         );
-        return printingDataRepository.save(printingDataEntity).getId();
+        return printingDataService.save(printingDataEntity).getId();
     }
     private PrintingFilesEntity savePrintingFilesEntity(@NonNull String contentBase64) {
         PrintingFilesEntity printingFilesEntity = new PrintingFilesEntity(contentBase64);
-        return printingFilesTable.save(printingFilesEntity);
+        return printingFilesService.save(printingFilesEntity);
     }
     private ActivityEntity createActivity(@NonNull ActivityType activityType) {
         return new ActivityEntity(
@@ -62,34 +53,22 @@ public class RepositoryFacade {
         PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(contentBase64);
         printingDataEntity.setValidatedContent(printingFilesEntity);
         printingDataEntity.setPrintingStatus(PrintingStatus.VALIDATED);
-        return printingDataRepository.save(printingDataEntity);
+        return printingDataService.save(printingDataEntity);
     }
     @Transactional
     public PrintingDataEntity saveContentParsed(PrintingDataEntity printingDataEntity, String contentBase64) {
         PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(contentBase64);
         printingDataEntity.setFinalContent(printingFilesEntity);
         printingDataEntity.setPrintingStatus(PrintingStatus.PROCESSED);
-        return printingDataRepository.save(printingDataEntity);
+        return printingDataService.save(printingDataEntity);
     }
 
     @Transactional
     public void saveStepFailed(PrintingDataEntity printingDataEntity, String errorMessage) {
         printingDataEntity.setErrorMessage(errorMessage);
         printingDataEntity.setPrintingStatus(PrintingStatus.ERROR);
-        printingDataRepository.save(printingDataEntity);
+        printingDataService.save(printingDataEntity);
     }
-
-    @SuppressWarnings("unchecked")
-    public List<PrintingLetterSetUpProjectionImplementor> getPrintingLetterSetUpProjections() {
-        List<Map<String, Object>> rows = (List<Map<String, Object>>) printingOptionsSQL
-                .getNativeQuery(PrintingOptionsRepo.NameOfSQL.LIST_PRINTING_SETUP)
-                .unwrap(NativeQuery.class)
-                .setTupleTransformer(RepositoryUtils.tupleTransformer())
-                .getResultList();
-        return PrintingLetterSetUpMapper.getPrintingLetterSetUpProjectionImplementors(rows);
-    }
-
-
 
 }
 
