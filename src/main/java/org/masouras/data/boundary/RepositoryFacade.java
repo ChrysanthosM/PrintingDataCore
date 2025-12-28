@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.data.domain.FileOkDto;
+import org.masouras.model.mssql.schema.jpa.boundary.ActivityService;
 import org.masouras.model.mssql.schema.jpa.boundary.PrintingDataService;
 import org.masouras.model.mssql.schema.jpa.boundary.PrintingFilesService;
 import org.masouras.model.mssql.schema.jpa.control.entity.ActivityEntity;
@@ -20,13 +21,14 @@ import java.time.LocalDateTime;
 @Slf4j
 @RequiredArgsConstructor
 public class RepositoryFacade {
+    private final ActivityService activityService;
     private final PrintingDataService printingDataService;
     private final PrintingFilesService printingFilesService;
 
     @Transactional
     public Long saveInitialPrintingData(FileOkDto fileOkDto, @NonNull String initialContentBase65) {
         PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(initialContentBase65);
-        ActivityEntity activityEntity = createActivity(fileOkDto.getActivityType());
+        ActivityEntity activityEntity = activityService.save(createActivity(fileOkDto.getActivityType()));
         PrintingDataEntity printingDataEntity = new PrintingDataEntity(
                 activityEntity,
                 fileOkDto.getContentType(),
