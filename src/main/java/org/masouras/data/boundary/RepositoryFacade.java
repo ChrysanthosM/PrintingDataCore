@@ -51,15 +51,15 @@ public class RepositoryFacade {
     }
 
     @Transactional
-    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, String contentBase64) {
-        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(contentBase64);
+    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, String validatedContentBase64) {
+        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(validatedContentBase64);
         printingDataEntity.setValidatedContent(printingFilesEntity);
         printingDataEntity.setPrintingStatus(PrintingStatus.VALIDATED);
         return printingDataService.save(printingDataEntity);
     }
     @Transactional
-    public PrintingDataEntity saveContentParsed(PrintingDataEntity printingDataEntity, String contentBase64) {
-        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(contentBase64);
+    public PrintingDataEntity saveContentParsed(PrintingDataEntity printingDataEntity, String finalContentBase64) {
+        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(finalContentBase64);
         printingDataEntity.setFinalContent(printingFilesEntity);
         printingDataEntity.setPrintingStatus(PrintingStatus.PROCESSED);
         return printingDataService.save(printingDataEntity);
