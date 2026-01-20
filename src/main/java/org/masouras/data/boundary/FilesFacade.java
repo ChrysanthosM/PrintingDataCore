@@ -38,7 +38,7 @@ public class FilesFacade {
 
     public @NonNull File getRelevantFile(File okFile, FileOkDto fileOkDto) {
         String baseName = FilenameUtils.removeExtension(okFile.getName());
-        return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().getCode());
+        return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().name());
     }
     public List<String> getPossibleRelevantFileNames(File okFile) {
         return Arrays.stream(FileExtensionType.values())

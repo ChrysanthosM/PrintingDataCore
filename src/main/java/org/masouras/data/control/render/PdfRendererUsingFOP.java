@@ -1,6 +1,8 @@
 package org.masouras.data.control.render;
 
 import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FopFactoryBuilder;
+import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.stereotype.Component;
@@ -12,11 +14,18 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 
 @Component
 public class PdfRendererUsingFOP implements PdfRenderer {
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-    private final FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
+    private final FopFactory fopFactory;
+
+    public PdfRendererUsingFOP() throws Exception {
+        FopFactoryBuilder builder = new FopFactoryBuilder(new File(".").toURI())
+                .setConfiguration(new DefaultConfigurationBuilder().build(getClass().getResourceAsStream("/rendering/config/fop/fop.xconf")));
+        fopFactory = builder.build();
+    }
 
     @Override
     public RendererType getPdfRendererType() {
