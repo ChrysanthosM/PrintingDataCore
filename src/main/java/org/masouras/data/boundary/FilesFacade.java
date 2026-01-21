@@ -10,6 +10,7 @@ import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionTyp
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.w3c.dom.Document;
+import tools.jackson.databind.ObjectMapper;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -138,4 +139,8 @@ public class FilesFacade {
     public String stringDocumentToBase64(String stringDocument) {
         return Base64.getEncoder().encodeToString(stringDocument.getBytes(StandardCharsets.UTF_8));
     }
+    public String objectToBase64(Object obj) {
+        return Base64.getEncoder().encodeToString(new ObjectMapper().writeValueAsString(obj).getBytes());
+    }
+
 }

@@ -23,7 +23,7 @@ public class XslTemplateService {
     private final Map<String, byte[]> xslTemplates = new HashMap<>();
 
     public byte[] getTemplate(XslType xslType) {
-        return xslTemplates.get(xslType.getCode());
+        return xslTemplates.get(xslType.name());
     }
 
     @PostConstruct
