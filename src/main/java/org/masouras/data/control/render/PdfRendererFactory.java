@@ -12,10 +12,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PdfRendererFactory {
     private final List<PdfRenderer> pdfRenderers;
-    private final Map<RendererType, PdfRenderer> pdfRendererMap;
+    private final Map<String, PdfRenderer> pdfRendererMap;
 
     public PdfRenderer getRenderer(RendererType rendererType) {
-        PdfRenderer renderer = pdfRendererMap.getOrDefault(rendererType,null);
+        PdfRenderer renderer = pdfRendererMap.getOrDefault(rendererType.name(),null);
         if (renderer == null) {
             throw new IllegalArgumentException("Unknown renderer: " + rendererType.name());
         }
@@ -24,6 +24,6 @@ public class PdfRendererFactory {
 
     @PostConstruct
     private void init() {
-        pdfRenderers.forEach(pdfRenderer -> pdfRendererMap.put(pdfRenderer.getPdfRendererType(), pdfRenderer));
+        pdfRenderers.forEach(pdfRenderer -> pdfRendererMap.put(pdfRenderer.getPdfRendererType().name(), pdfRenderer));
     }
 }
