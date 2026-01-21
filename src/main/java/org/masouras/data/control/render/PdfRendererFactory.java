@@ -24,6 +24,6 @@ public class PdfRendererFactory {
 
     @PostConstruct
     private void init() {
-        pdfRenderers.forEach(fv -> pdfRendererMap.put(fv.getPdfRendererType(), fv));
+        pdfRenderers.forEach(pdfRenderer -> pdfRendererMap.put(pdfRenderer.getPdfRendererType(), pdfRenderer));
     }
 }
