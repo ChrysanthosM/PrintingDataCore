@@ -25,6 +25,20 @@ public class RepositoryFacade {
     private final PrintingDataService printingDataService;
     private final PrintingFilesService printingFilesService;
 
+    private PrintingFilesEntity savePrintingFilesEntity(@NonNull String contentBase64) {
+        PrintingFilesEntity printingFilesEntity = new PrintingFilesEntity(contentBase64);
+        return printingFilesService.save(printingFilesEntity);
+    }
+
+    private ActivityEntity createActivity(@NonNull ActivityType activityType) {
+        return new ActivityEntity(
+                activityType,
+                this.getClass().getName(),
+                System.getProperty("user.name"),
+                LocalDateTime.now()
+        );
+    }
+
     @Transactional
     public Long saveInitialPrintingData(FileOkDto fileOkDto, @NonNull String initialContentBase65) {
         PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(initialContentBase65);
@@ -37,19 +51,6 @@ public class RepositoryFacade {
         );
         return printingDataService.save(printingDataEntity).getId();
     }
-    private PrintingFilesEntity savePrintingFilesEntity(@NonNull String contentBase64) {
-        PrintingFilesEntity printingFilesEntity = new PrintingFilesEntity(contentBase64);
-        return printingFilesService.save(printingFilesEntity);
-    }
-    private ActivityEntity createActivity(@NonNull ActivityType activityType) {
-        return new ActivityEntity(
-                activityType,
-                this.getClass().getName(),
-                System.getProperty("user.name"),
-                LocalDateTime.now()
-        );
-    }
-
     @Transactional
     public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, String validatedContentBase64) {
         PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(validatedContentBase64);
@@ -71,6 +72,5 @@ public class RepositoryFacade {
         printingDataEntity.setPrintingStatus(PrintingStatus.ERROR);
         printingDataService.save(printingDataEntity);
     }
-
 }
 

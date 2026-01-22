@@ -140,7 +140,7 @@ public class FilesFacade {
         return Base64.getEncoder().encodeToString(stringDocument.getBytes(StandardCharsets.UTF_8));
     }
     public String objectToBase64(Object obj) {
-        return Base64.getEncoder().encodeToString(new ObjectMapper().writeValueAsString(obj).getBytes());
+        return Base64.getEncoder().encodeToString(new ObjectMapper().writeValueAsString(obj).getBytes(StandardCharsets.UTF_8));
     }
 
 }
