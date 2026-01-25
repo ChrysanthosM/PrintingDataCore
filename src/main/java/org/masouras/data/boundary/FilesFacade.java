@@ -26,10 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -47,12 +44,12 @@ public class FilesFacade {
                 .toList();
     }
 
-    public String getContentBase64(File fromFile) {
+    public Optional<byte[]> getContentBytes(File fromFile) {
         try {
-            return Base64.getEncoder().encodeToString(Files.readAllBytes(fromFile.toPath()));
+            return Optional.of(Files.readAllBytes(fromFile.toPath()));
         } catch (IOException e) {
             log.error("Failed to read relevant File: {}", fromFile.getAbsolutePath(), e);
-            return null;
+            return Optional.empty();
         }
     }
 

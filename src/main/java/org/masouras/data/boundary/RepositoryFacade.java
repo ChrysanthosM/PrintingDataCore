@@ -25,8 +25,8 @@ public class RepositoryFacade {
     private final PrintingDataService printingDataService;
     private final PrintingFilesService printingFilesService;
 
-    private PrintingFilesEntity savePrintingFilesEntity(@NonNull String contentBase64) {
-        PrintingFilesEntity printingFilesEntity = new PrintingFilesEntity(contentBase64);
+    private PrintingFilesEntity savePrintingFilesEntity(byte[] contentBinary) {
+        PrintingFilesEntity printingFilesEntity = new PrintingFilesEntity(contentBinary);
         return printingFilesService.save(printingFilesEntity);
     }
 
@@ -40,8 +40,8 @@ public class RepositoryFacade {
     }
 
     @Transactional
-    public Long saveInitialPrintingData(FileOkDto fileOkDto, @NonNull String initialContentBase65) {
-        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(initialContentBase65);
+    public Long saveInitialPrintingData(FileOkDto fileOkDto, byte[] initialContentBinary) {
+        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(initialContentBinary);
         ActivityEntity activityEntity = activityService.save(createActivity(fileOkDto.getActivityType()));
         PrintingDataEntity printingDataEntity = new PrintingDataEntity(
                 activityEntity,
@@ -52,15 +52,15 @@ public class RepositoryFacade {
         return printingDataService.save(printingDataEntity).getId();
     }
     @Transactional
-    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, String validatedContentBase64) {
-        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(validatedContentBase64);
+    public PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, byte[] validatedContentBinary) {
+        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(validatedContentBinary);
         printingDataEntity.setValidatedContent(printingFilesEntity);
         printingDataEntity.setPrintingStatus(PrintingStatus.VALIDATED);
         return printingDataService.save(printingDataEntity);
     }
     @Transactional
-    public PrintingDataEntity saveContentParsed(PrintingDataEntity printingDataEntity, String finalContentBase64) {
-        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(finalContentBase64);
+    public PrintingDataEntity saveContentParsed(PrintingDataEntity printingDataEntity, byte[] finalContentBinary) {
+        PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(finalContentBinary);
         printingDataEntity.setFinalContent(printingFilesEntity);
         printingDataEntity.setPrintingStatus(PrintingStatus.PROCESSED);
         return printingDataService.save(printingDataEntity);
