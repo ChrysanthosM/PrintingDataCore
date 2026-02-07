@@ -3,6 +3,7 @@ package org.masouras.data.control.render;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
+import org.apache.fop.configuration.Configuration;
 import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
@@ -15,15 +16,29 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class PdfRendererUsingFOP implements PdfRenderer {
+    private static final String FOP_CONFIG_XML = """
+        <fop version="1.0">
+          <renderers>
+            <renderer mime="application/pdf">
+              <fonts>
+                <auto-detect embedding-mode="subset"/>
+              </fonts>
+            </renderer>
+          </renderers>
+        </fop>
+        """;
+
     private final FopFactory fopFactory;
 
     public PdfRendererUsingFOP() throws Exception {
-        FopFactoryBuilder builder = new FopFactoryBuilder(new File(".").toURI())
-                .setConfiguration(new DefaultConfigurationBuilder().build(getClass().getResourceAsStream("/rendering/config/fop/fop.xconf")));
-        fopFactory = builder.build();
+        DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
+        Configuration cfg = cfgBuilder.build(new ByteArrayInputStream(FOP_CONFIG_XML.getBytes(StandardCharsets.UTF_8)));
+        FopFactoryBuilder builder = new FopFactoryBuilder(new File(".").toURI()).setConfiguration(cfg);
+        this.fopFactory = builder.build();
     }
 
     @Override

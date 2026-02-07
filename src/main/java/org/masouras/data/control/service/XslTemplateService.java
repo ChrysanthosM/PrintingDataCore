@@ -3,6 +3,7 @@ package org.masouras.data.control.service;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.XslType;
 import org.springframework.core.io.Resource;
@@ -27,18 +28,29 @@ public class XslTemplateService {
     }
 
     @PostConstruct
-    public void loadXslTemplates() throws IOException {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    public void loadXslTemplates() {
+        Optional<Resource[]> resources = getRenderingResources();
+        if (resources.isEmpty()) return;
 
-        Resource[] resources = resolver.getResources("classpath:rendering/xsl/*.*");
         xslTemplates.putAll(
-                Arrays.stream(resources)
+                Arrays.stream(resources.get())
                         .filter(Resource::isReadable)
                         .filter(res -> StringUtils.isNotBlank(res.getFilename()))
                         .map(res -> Map.entry(FilenameUtils.getBaseName(res.getFilename()).toUpperCase(), getResourceBytes(res)))
                         .filter(entry -> entry.getValue().isPresent())
                         .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
+    private Optional<Resource[]> getRenderingResources() {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        try {
+            Resource[] resources = resolver.getResources("classpath*:rendering/xsl/*.*");
+            return ArrayUtils.isEmpty(resources) ? Optional.empty() : Optional.of(resources);
+        } catch (IOException e) {
+            log.error("No XSL templates found under classpath*:rendering/xsl/ (folder missing)");
+            return Optional.empty();
+        }
+    }
+
     private Optional<byte[]> getResourceBytes(Resource res) {
         try (InputStream inputStream = res.getInputStream()) {
             return Optional.of(inputStream.readAllBytes());
