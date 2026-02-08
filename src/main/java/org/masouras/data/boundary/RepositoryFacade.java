@@ -3,7 +3,7 @@ package org.masouras.data.boundary;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.data.domain.FileOkDto;
+import org.masouras.data.domain.TriggerFileDto;
 import org.masouras.model.mssql.schema.jpa.boundary.ActivityService;
 import org.masouras.model.mssql.schema.jpa.boundary.PrintingDataService;
 import org.masouras.model.mssql.schema.jpa.boundary.PrintingFilesService;
@@ -40,13 +40,13 @@ public class RepositoryFacade {
     }
 
     @Transactional
-    public Long saveInitialPrintingData(FileOkDto fileOkDto, byte[] initialContentBinary) {
+    public Long saveInitialPrintingData(TriggerFileDto triggerFileDto, byte[] initialContentBinary) {
         PrintingFilesEntity printingFilesEntity = savePrintingFilesEntity(initialContentBinary);
-        ActivityEntity activityEntity = activityService.save(createActivity(fileOkDto.getActivityType()));
+        ActivityEntity activityEntity = activityService.save(createActivity(triggerFileDto.getActivityType()));
         PrintingDataEntity printingDataEntity = new PrintingDataEntity(
                 activityEntity,
-                fileOkDto.getContentType(),
-                fileOkDto.getFileExtensionType(),
+                triggerFileDto.getContentType(),
+                triggerFileDto.getFileExtensionType(),
                 printingFilesEntity
         );
         return printingDataService.save(printingDataEntity).getId();

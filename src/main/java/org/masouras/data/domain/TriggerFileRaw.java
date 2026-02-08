@@ -4,7 +4,7 @@ import com.opencsv.bean.CsvBindByPosition;
 import lombok.Getter;
 
 @Getter
-public class FileOkRaw {
+public class TriggerFileRaw {
     @CsvBindByPosition(position = 0)
     private String fileExtension;
 

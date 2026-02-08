@@ -6,7 +6,7 @@ import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
 
 @Data
-public class FileOkDto {
+public class TriggerFileDto {
     private final FileExtensionType fileExtensionType;
     private final ContentType contentType;
     private final ActivityType activityType;

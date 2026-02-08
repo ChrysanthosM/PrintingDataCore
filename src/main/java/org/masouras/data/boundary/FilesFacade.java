@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.masouras.data.control.converter.CsvParser;
-import org.masouras.data.domain.FileOkDto;
+import org.masouras.data.domain.TriggerFileDto;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
@@ -34,13 +34,13 @@ import java.util.*;
 public class FilesFacade {
     private final CsvParser csvParser;
 
-    public @NonNull File getRelevantFile(File okFile, FileOkDto fileOkDto) {
-        String baseName = FilenameUtils.removeExtension(okFile.getName());
-        return new File(okFile.getParentFile(), baseName + "." + fileOkDto.getFileExtensionType().name());
+    public @NonNull File getRelevantFile(File triggerFile, TriggerFileDto triggerFileDto) {
+        String baseName = FilenameUtils.removeExtension(triggerFile.getName());
+        return new File(triggerFile.getParentFile(), baseName + "." + triggerFileDto.getFileExtensionType().name());
     }
-    public List<String> getPossibleRelevantFileNames(File okFile) {
+    public List<String> getPossibleRelevantFileNames(File triggerFile) {
         return Arrays.stream(FileExtensionType.values())
-                .map(ext -> new File(okFile.getParent(), FilenameUtils.removeExtension(okFile.getName()) + "." + ext.getCode().toLowerCase()).getAbsolutePath())
+                .map(ext -> new File(triggerFile.getParent(), FilenameUtils.removeExtension(triggerFile.getName()) + "." + ext.name().toLowerCase()).getAbsolutePath())
                 .toList();
     }
 
