@@ -1,5 +1,6 @@
 package org.masouras.data.control.render;
 
+import com.google.common.annotations.Beta;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.stereotype.Component;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -11,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
+@Beta
 @Component
 public class PdfRendererUsingFlyingSaucer implements PdfRenderer {
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
