@@ -7,10 +7,11 @@ import org.apache.fop.configuration.Configuration;
 import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
@@ -19,7 +20,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 @Component
-public class PdfRendererUsingFOP implements PdfRenderer {
+public non-sealed class PdfRendererUsingFOP implements PdfRenderer {
     private static final String FOP_CONFIG_XML = """
         <fop version="1.0">
           <renderers>
@@ -34,6 +35,7 @@ public class PdfRendererUsingFOP implements PdfRenderer {
 
     private final FopFactory fopFactory;
 
+    @Autowired
     public PdfRendererUsingFOP() throws Exception {
         DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
         Configuration cfg = cfgBuilder.build(new ByteArrayInputStream(FOP_CONFIG_XML.getBytes(StandardCharsets.UTF_8)));
@@ -47,15 +49,13 @@ public class PdfRendererUsingFOP implements PdfRenderer {
     }
 
     @Override
-    public byte[] generate(byte[] xml, byte[] xsl) {
+    public byte[] generate(Templates templates, byte[] xml) {
         try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(xml);
-             ByteArrayInputStream xslStream = new ByteArrayInputStream(xsl);
              ByteArrayOutputStream pdfOut = new ByteArrayOutputStream()) {
 
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, fopFactory.newFOUserAgent(), pdfOut);
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslStream));
+            Transformer transformer = templates.newTransformer();
             transformer.transform(
                     new StreamSource(xmlStream),
                     new SAXResult(fop.getDefaultHandler()));

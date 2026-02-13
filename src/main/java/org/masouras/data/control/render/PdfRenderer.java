@@ -2,7 +2,9 @@ package org.masouras.data.control.render;
 
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 
-public interface PdfRenderer {
+import javax.xml.transform.Templates;
+
+public sealed interface PdfRenderer permits PdfRendererUsingFOP, PdfRendererUsingFlyingSaucer {
     RendererType getPdfRendererType();
-    byte[] generate(byte[] xml, byte[] xsl);
+    byte[] generate(Templates templates, byte[] xml);
 }

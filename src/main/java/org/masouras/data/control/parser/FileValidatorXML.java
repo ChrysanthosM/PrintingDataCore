@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class FileValidatorXML implements FileValidator {
+public non-sealed class FileValidatorXML implements FileValidator {
     private static final char MAX_BMP_BEFORE_SURROGATE = '\uD7FF'; // 0xD7FF
     private static final char MIN_BMP_AFTER_SURROGATE  = '\uE000'; // 0xE000
     private static final char MAX_BMP                  = '\uFFFD'; // 0xFFFD

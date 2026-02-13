@@ -16,6 +16,7 @@ import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionTyp
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ValidFlag;
 import org.springframework.stereotype.Service;
 
+import javax.xml.transform.Templates;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FileProcessorXML implements FileProcessor {
+public non-sealed class FileProcessorXML implements FileProcessor {
     private final PrintingLetterSetUpService printingLetterSetUpService;
     private final PdfRendererService pdfRendererService;
     private final XslTemplateService xslTemplateService;
@@ -57,17 +58,25 @@ public class FileProcessorXML implements FileProcessor {
 
         List<byte[]> pdfResultList = implementorList.parallelStream()
                 .filter(implementor -> implementor.getValidFlag() == ValidFlag.ENABLED)
-                .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType())))
-                .filter(entry -> ArrayUtils.isNotEmpty(entry.getValue()))
-                .map(entry ->
-                        pdfRendererService.generatePdf(
-                                entry.getKey().getRendererType(),
-                                validatedContent,
-                                entry.getValue()
-                        )
+                .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType().name())))
+                .filter(entry -> entry.getValue() != null)
+                .map(entry -> {
+                    logEntry(entry);
+                    return pdfRendererService.generatePdf(
+                                    entry.getKey().getRendererType(),
+                                    entry.getValue(),
+                                    validatedContent);
+                        }
                 )
                 .toList();
 
         return FileProcessorResult.success(pdfResultList);
+    }
+
+    private void logEntry(AbstractMap.SimpleEntry<PrintingLetterSetUpProjectionImplementor, Templates> entry) {
+        if (log.isInfoEnabled()) {
+            log.info("pdfRendererService will generatePdf with ActivityType: {}, ContentType: {}, XslType: {}, RendererType: {}",
+                    entry.getKey().getActivityType().name(), entry.getKey().getContentType().name(), entry.getKey().getXslType().name(), entry.getKey().getRendererType().name());
+        }
     }
 }

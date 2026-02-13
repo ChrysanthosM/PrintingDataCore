@@ -1,21 +1,19 @@
 package org.masouras.data.control.render;
 
-import com.google.common.annotations.Beta;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.stereotype.Component;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-@Beta
 @Component
-public class PdfRendererUsingFlyingSaucer implements PdfRenderer {
-    private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+public non-sealed class PdfRendererUsingFlyingSaucer implements PdfRenderer {
 
     @Override
     public RendererType getPdfRendererType() {
@@ -23,31 +21,31 @@ public class PdfRendererUsingFlyingSaucer implements PdfRenderer {
     }
 
     @Override
-    public byte[] generate(byte[] xml, byte[] xsl) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public byte[] generate(Templates templates, byte[] xml) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(transformXmlToHtml(xml, xsl));
-            renderer.layout();
-            renderer.createPDF(out);
+            ITextRenderer iTextRenderer = new ITextRenderer();
+            iTextRenderer.setDocumentFromString(transformXmlToHtml(templates, xml));
+            iTextRenderer.layout();
+            iTextRenderer.createPDF(outputStream);
 
-            return out.toByteArray();
+            return outputStream.toByteArray();
         } catch (Exception e) {
             throw new RuntimeException("Flying Saucer PDF generation failed", e);
         }
     }
 
-    private String transformXmlToHtml(byte[] xml, byte[] xsl) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            transformerFactory.newTransformer(new StreamSource(new ByteArrayInputStream(xsl))).transform(
+    private String transformXmlToHtml(Templates templates, byte[] xml) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Transformer transformer = templates.newTransformer();
+            transformer.transform(
                     new StreamSource(new ByteArrayInputStream(xml)),
-                    new StreamResult(out));
-            return out.toString(StandardCharsets.UTF_8);
+                    new StreamResult(outputStream));
+
+            return outputStream.toString(StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("XSLT transform failed", e);
+            throw new RuntimeException("transformXmlToHtml transform failed", e);
         }
     }
-
 }
