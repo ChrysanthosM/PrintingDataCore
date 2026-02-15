@@ -15,11 +15,11 @@ public class FileValidatorFactory {
     private final List<FileValidator> fileValidators;
     private final Map<String, FileValidator> fileValidatorMap = new HashMap<>();
 
-    @Nullable
-    public FileValidator getFileValidator(String fileExtensionType) { return fileValidatorMap.getOrDefault(fileExtensionType, null); }
-
     @PostConstruct
     private void init() {
         fileValidators.forEach(fv -> fileValidatorMap.put(fv.getFileExtensionType().name(), fv));
     }
+
+    @Nullable
+    public FileValidator getFileValidator(String fileExtensionType) { return fileValidatorMap.getOrDefault(fileExtensionType, null); }
 }
