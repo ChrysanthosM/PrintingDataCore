@@ -17,7 +17,7 @@ public class FileValidatorFactory {
 
     @PostConstruct
     private void init() {
-        fileValidators.forEach(fv -> fileValidatorMap.put(fv.getFileExtensionType().name(), fv));
+        fileValidators.forEach(fileValidator -> fileValidatorMap.put(fileValidator.getFileExtensionType().name(), fileValidator));
     }
 
     @Nullable

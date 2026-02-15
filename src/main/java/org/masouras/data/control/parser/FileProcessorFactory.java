@@ -17,7 +17,7 @@ public class FileProcessorFactory {
 
     @PostConstruct
     private void init() {
-        fileProcessors.forEach(fv -> fileProcessorMap.put(fv.getFileExtensionType().name(), fv));
+        fileProcessors.forEach(fileProcessor -> fileProcessorMap.put(fileProcessor.getFileExtensionType().name(), fileProcessor));
     }
 
     @Nullable
