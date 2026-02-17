@@ -10,7 +10,6 @@ import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionTyp
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.w3c.dom.Document;
-import tools.jackson.databind.ObjectMapper;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -18,10 +17,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,11 +129,25 @@ public class FilesFacade {
         return writer.getBuffer().toString();
     }
 
-    public String stringDocumentToBase64(String stringDocument) {
-        return Base64.getEncoder().encodeToString(stringDocument.getBytes(StandardCharsets.UTF_8));
+    public byte[] objectToByteArray(Object obj) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+            objectOutputStream.writeObject(obj);
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Serialization failed", e);
+        }
     }
-    public String objectToBase64(Object obj) {
-        return Base64.getEncoder().encodeToString(new ObjectMapper().writeValueAsString(obj).getBytes(StandardCharsets.UTF_8));
+    @SuppressWarnings("unchecked")
+    public <T> List<T> byteArrayToObject(byte[] data) {
+        if (data == null) return null;
+
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+            return (List<T>) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Deserialization failed", e);
+        }
     }
 
 }
