@@ -141,7 +141,6 @@ public class FilesFacade {
     @SuppressWarnings("unchecked")
     public <T> List<T> byteArrayToObject(byte[] data) {
         if (data == null) return null;
-
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
              ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
             return (List<T>) objectInputStream.readObject();
