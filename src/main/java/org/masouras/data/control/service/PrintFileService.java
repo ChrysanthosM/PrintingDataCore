@@ -10,6 +10,7 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
 import org.masouras.data.boundary.FilesFacade;
+import org.masouras.model.mssql.schema.jpa.control.entity.PrintingFilesEntity;
 import org.springframework.stereotype.Service;
 
 import javax.print.PrintService;
@@ -37,24 +38,24 @@ public class PrintFileService {
                 .toList();
     }
 
-    public void printPdf(byte[] pdfBytes, @Nullable String selectedPrinter) {
-        printPdf(pdfBytes, selectedPrinter, null);
+    public void printPdf(PrintingFilesEntity printingFilesEntity, @Nullable String selectedPrinter) {
+        printPdf(printingFilesEntity, selectedPrinter, null);
     }
-    public void printPdf(byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
-        List<byte[]> pdfResultList = filesFacade.byteArrayToObject(pdfBytes);
+    public void printPdf(PrintingFilesEntity printingFilesEntity, @Nullable String selectedPrinter, @Nullable String outputPath) {
+        List<byte[]> pdfResultList = filesFacade.byteArrayToObject(printingFilesEntity.getContentBinary());
         if (CollectionUtils.isEmpty(pdfResultList)) {
             if (log.isWarnEnabled()) log.warn("pdfResultList is empty after converting byte array to object. Cannot print PDFs.");
             return;
         }
-        pdfResultList.forEach(result -> printPdfMain(result, selectedPrinter, outputPath));
+        pdfResultList.forEach(result -> printPdfMain(printingFilesEntity, result, selectedPrinter, outputPath));
     }
 
-    private void printPdfMain(byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
+    private void printPdfMain(PrintingFilesEntity printingFilesEntity, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
         if (!isLikelyPdf(pdfBytes)) {
-            if (log.isWarnEnabled()) log.warn("Data does not appear to be a valid PDF. Skipping print.");
+            if (log.isWarnEnabled()) log.warn("Data does not appear to be a valid PDF. Skipping print for printingFilesEntity: {}", printingFilesEntity.getId());
             return;
         }
-        if (log.isInfoEnabled()) log.info("PDF result size: {}", pdfBytes.length);
+        if (log.isInfoEnabled()) log.info("PDF result size for printingFilesEntity {}: {}", printingFilesEntity.getId(), pdfBytes.length);
 
         try (PDDocument pdDocument = Loader.loadPDF(pdfBytes)) {
             PrinterJob printerJob = PrinterJob.getPrinterJob();
@@ -70,7 +71,7 @@ public class PrintFileService {
 
             PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
             if (StringUtils.isNotBlank(outputPath)) {
-                attr.add(new Destination(Paths.get(outputPath).toUri()));
+                attr.add(new Destination(Paths.get(outputPath, printingFilesEntity.getId() + ".pdf").toUri()));
             }
             printerJob.print(attr);
         } catch (Exception e) {
