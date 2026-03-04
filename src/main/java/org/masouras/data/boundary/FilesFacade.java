@@ -56,6 +56,10 @@ public class FilesFacade {
     }
 
     public void copyFile(File file, String toPath) {
+        if (!file.exists() || !file.isFile()) {
+            if (log.isWarnEnabled()) log.warn("{} is not a file", file.getName());
+            return;
+        }
         if (!ensureFolderExists(toPath)) {
             if (log.isWarnEnabled()) {
                 log.warn("Folder NOT exists/created : '{}'", toPath);

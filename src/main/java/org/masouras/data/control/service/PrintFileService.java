@@ -1,16 +1,14 @@
 package org.masouras.data.control.service;
 
+import com.google.common.base.Preconditions;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
-import org.masouras.data.boundary.FilesFacade;
-import org.masouras.model.mssql.schema.jpa.control.entity.PrintingFilesEntity;
 import org.springframework.stereotype.Service;
 
 import javax.print.PrintService;
@@ -21,15 +19,13 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PrintFileService {
-    private final FilesFacade filesFacade;
 
     public List<String> getAvailablePrinters() {
         return Arrays.stream(PrinterJob.lookupPrintServices())
@@ -38,25 +34,17 @@ public class PrintFileService {
                 .toList();
     }
 
-    public void printPdf(PrintingFilesEntity printingFilesEntity, @Nullable String selectedPrinter) {
-        printPdf(printingFilesEntity, selectedPrinter, null);
+    public void printPdf(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter) {
+        printPdf(printingID, pdfBytes, selectedPrinter, null);
     }
-    public void printPdf(PrintingFilesEntity printingFilesEntity, @Nullable String selectedPrinter, @Nullable String outputPath) {
-        List<byte[]> pdfResultList = filesFacade.byteArrayToObject(printingFilesEntity.getContentBinary());
-        if (CollectionUtils.isEmpty(pdfResultList)) {
-            if (log.isWarnEnabled()) log.warn("pdfResultList is empty after converting byte array to object. Cannot print PDFs.");
-            return;
-        }
-        pdfResultList.forEach(result -> printPdfMain(printingFilesEntity, result, selectedPrinter, outputPath));
+    public void printPdf(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(printingID));
+        Preconditions.checkArgument(ArrayUtils.isNotEmpty(pdfBytes), "PDF byte array cannot be empty");
+        Preconditions.checkArgument(isLikelyPdf(pdfBytes), "Provided byte array does not appear to be a valid PDF");
+        if (log.isInfoEnabled()) log.info("Starting printPdf for printingID {} with PDF byte array of size {}", printingID, pdfBytes.length);
+        printPdfMain(printingID, pdfBytes, selectedPrinter, outputPath);
     }
-
-    private void printPdfMain(PrintingFilesEntity printingFilesEntity, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
-        if (!isLikelyPdf(pdfBytes)) {
-            if (log.isWarnEnabled()) log.warn("Data does not appear to be a valid PDF. Skipping print for printingFilesEntity: {}", printingFilesEntity.getId());
-            return;
-        }
-        if (log.isInfoEnabled()) log.info("PDF result size for printingFilesEntity {}: {}", printingFilesEntity.getId(), pdfBytes.length);
-
+    public void printPdfMain(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
         try (PDDocument pdDocument = Loader.loadPDF(pdfBytes)) {
             PrinterJob printerJob = PrinterJob.getPrinterJob();
             printerJob.setJobName("Print pdDocument");
@@ -71,7 +59,7 @@ public class PrintFileService {
 
             PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
             if (StringUtils.isNotBlank(outputPath)) {
-                attr.add(new Destination(Paths.get(outputPath, printingFilesEntity.getId() + ".pdf").toUri()));
+                attr.add(new Destination(Paths.get(outputPath, printingID + ".pdf").toUri()));
             }
             printerJob.print(attr);
         } catch (Exception e) {
