@@ -7,7 +7,9 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;import java.util.concurrent.Future;import java.util.function.Consumer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 @UtilityClass
 @Slf4j

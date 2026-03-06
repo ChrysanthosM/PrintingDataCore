@@ -45,6 +45,7 @@ public class RepositoryFacade {
         ActivityEntity activityEntity = activityService.save(createActivity(triggerFileDto.getActivityType()));
         PrintingDataEntity printingDataEntity = new PrintingDataEntity(
                 activityEntity,
+                triggerFileDto.getPrintingWayType(),
                 triggerFileDto.getContentType(),
                 triggerFileDto.getFileExtensionType(),
                 printingFilesEntity

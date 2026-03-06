@@ -19,7 +19,8 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Service
