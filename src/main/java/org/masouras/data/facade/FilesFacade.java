@@ -1,4 +1,4 @@
-package org.masouras.data.boundary;
+package org.masouras.data.facade;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

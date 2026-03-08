@@ -25,11 +25,6 @@
             <artifactId>PrintingDataModel</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.masouras</groupId>
-            <artifactId>OpenTelemetryTracer</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

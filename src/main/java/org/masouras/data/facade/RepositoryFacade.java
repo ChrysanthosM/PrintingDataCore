@@ -1,4 +1,4 @@
-package org.masouras.data.boundary;
+package org.masouras.data.facade;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +37,10 @@ public class RepositoryFacade {
                 System.getProperty("user.name"),
                 LocalDateTime.now()
         );
+    }
+
+    public @NonNull PrintingDataEntity getPrintingDataEntityById(@NonNull Long id) {
+        return printingDataService.findById(id);
     }
 
     @Transactional
