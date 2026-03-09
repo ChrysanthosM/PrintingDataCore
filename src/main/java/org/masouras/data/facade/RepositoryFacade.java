@@ -12,6 +12,7 @@ import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingFilesEntity;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingStatus;
+import org.masouras.util.HibernateUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +40,11 @@ public class RepositoryFacade {
         );
     }
 
+    @Transactional(readOnly = true)
     public @NonNull PrintingDataEntity getPrintingDataEntityById(@NonNull Long id) {
-        return printingDataService.findById(id);
+        PrintingDataEntity printingDataEntity = printingDataService.findById(id);
+        HibernateUtil.initializeLazy(printingDataEntity);
+        return printingDataEntity;
     }
 
     @Transactional
