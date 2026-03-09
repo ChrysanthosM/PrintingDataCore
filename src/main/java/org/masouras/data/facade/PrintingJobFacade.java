@@ -11,6 +11,7 @@ import org.masouras.data.control.parser.FileProcessorFactory;
 import org.masouras.data.domain.FileProcessorResult;
 import org.masouras.data.exception.ValidationException;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,10 +23,14 @@ public class PrintingJobFacade implements PrintingDataEntityProcessor {
     private final RepositoryFacade repositoryFacade;
 
     @Override
-    public void processPrintingDataEntity(Long printingDataEntityId) {
+    public PrintingDataEntity processPrintingDataEntity(Long printingDataEntityId) {
         if (log.isInfoEnabled()) log.info("{}: Parsing printingDataEntity {}", this.getClass().getSimpleName(), printingDataEntityId);
         PrintingDataEntity printingDataEntity = repositoryFacade.getPrintingDataEntityById(printingDataEntityId);
-        processPrintingDataEntity(printingDataEntity);
+        if (printingDataEntity.getPrintingStatus() != PrintingStatus.PROCESSED) {
+            if (log.isInfoEnabled()) log.info("{}: Parsing printingDataEntity not PROCESSED yet, skipping: {}", this.getClass().getSimpleName(), printingDataEntityId);
+            return printingDataEntity;
+        }
+        return processPrintingDataEntity(printingDataEntity);
     }
 
     @Timed("PrintingJobFacade.processPrintingDataEntity")
