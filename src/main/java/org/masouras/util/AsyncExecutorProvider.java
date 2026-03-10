@@ -7,8 +7,6 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -51,19 +49,4 @@ public class AsyncExecutorProvider {
             successHandler.accept(result);
         }
     }
-
-    public static <T> T unwrapNonBlockingFuture(Future<T> future) {
-        if (future == null) return null;
-        if (!future.isDone()) {
-            if (log != null && log.isWarnEnabled()) log.warn("Future result is not done yet, cannot unwrap non-blocking.");
-            return null;
-        }
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to unwrap completed Future", e);
-            return null;
-        }
-    }
-
 }

@@ -1,0 +1,22 @@
+package org.masouras.control.converter;
+
+import lombok.experimental.UtilityClass;
+import org.masouras.domain.TriggerFileDto;
+import org.masouras.domain.TriggerFileRaw;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
+import org.masouras.model.mssql.schema.jpa.control.util.EnumUtil;
+
+@UtilityClass
+public class TriggerFileAdapter {
+    public static TriggerFileDto toTriggerFileDto(TriggerFileRaw triggerFileRaw, PrintingWayType printingWayType) {
+        return new TriggerFileDto(
+                printingWayType,
+                EnumUtil.fromCode(FileExtensionType.class, triggerFileRaw.getFileExtension()),
+                EnumUtil.fromCode(ContentType.class, triggerFileRaw.getContentType()),
+                EnumUtil.fromCode(ActivityType.class, triggerFileRaw.getActivityType())
+        );
+    }
+}

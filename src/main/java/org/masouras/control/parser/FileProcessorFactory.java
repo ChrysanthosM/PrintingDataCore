@@ -1,0 +1,25 @@
+package org.masouras.control.parser;
+
+import jakarta.annotation.Nullable;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+@RequiredArgsConstructor
+public class FileProcessorFactory {
+    private final List<FileProcessor> fileProcessors;
+    private final Map<String, FileProcessor> fileProcessorMap = new HashMap<>();
+
+    @PostConstruct
+    private void init() {
+        fileProcessors.forEach(fileProcessor -> fileProcessorMap.put(fileProcessor.getFileExtensionType().name(), fileProcessor));
+    }
+
+    @Nullable
+    public FileProcessor getFileProcessor(String fileExtensionType) { return fileProcessorMap.getOrDefault(fileExtensionType, null); }
+}
