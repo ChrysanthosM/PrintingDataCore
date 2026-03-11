@@ -26,8 +26,13 @@ public class PrintingDataEntityValidateService {
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
 
-    @Timed("PrintingDataEntityValidateService.processPrintingDataEntity")
-    @Counted("PrintingDataEntityValidateService.processPrintingDataEntity")
+    public PrintingDataEntity validate(Long printingDataEntityId) {
+        PrintingDataEntity printingDataEntity = repositoryFacade.getPrintingDataEntityById(printingDataEntityId);
+        return validate(printingDataEntity);
+    }
+
+    @Timed("printing.data.entity.validate")
+    @Counted("printing.data.entity.validate")
     public PrintingDataEntity validate(PrintingDataEntity printingDataEntity) {
         if (log.isInfoEnabled()) log.info("{}: Validating printingDataEntity {}", this.getClass().getSimpleName(), printingDataEntity.getId());
         return saveContentValidated(printingDataEntity, getFileValidatorResult(printingDataEntity));

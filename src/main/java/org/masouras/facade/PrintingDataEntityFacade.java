@@ -17,6 +17,10 @@ public class PrintingDataEntityFacade implements PrintingDataEntityValidator, Pr
     private final PrintingDataEntityValidateService printingDataEntityValidateService;
 
     @Override
+    public PrintingDataEntity validatePrintingDataEntity(Long printingDataEntityId) {
+        return printingDataEntityValidateService.validate(printingDataEntityId);
+    }
+    @Override
     public PrintingDataEntity validatePrintingDataEntity(PrintingDataEntity printingDataEntity) {
         return printingDataEntityValidateService.validate(printingDataEntity);
     }

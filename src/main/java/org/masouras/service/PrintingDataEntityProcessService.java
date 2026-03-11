@@ -12,7 +12,6 @@ import org.masouras.exception.ValidationException;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.RepositoryFacade;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,17 +23,12 @@ public class PrintingDataEntityProcessService {
     private final RepositoryFacade repositoryFacade;
 
     public PrintingDataEntity process(Long printingDataEntityId) {
-        if (log.isInfoEnabled()) log.info("{}: Parsing printingDataEntity {}", this.getClass().getSimpleName(), printingDataEntityId);
         PrintingDataEntity printingDataEntity = repositoryFacade.getPrintingDataEntityById(printingDataEntityId);
-        if (printingDataEntity.getPrintingStatus() != PrintingStatus.PROCESSED) {
-            if (log.isInfoEnabled()) log.info("{}: Parsing printingDataEntity not PROCESSED yet, skipping: {}", this.getClass().getSimpleName(), printingDataEntityId);
-            return printingDataEntity;
-        }
         return process(printingDataEntity);
     }
 
-    @Timed("PrintingDataEntityProcessService.processPrintingDataEntity")
-    @Counted("PrintingDataEntityProcessService.processPrintingDataEntity")
+    @Timed("printing.data.entity.process")
+    @Counted("printing.data.entity.process")
     public PrintingDataEntity process(PrintingDataEntity printingDataEntity) {
         if (log.isInfoEnabled()) log.info("{}: Parsing printingDataEntity {}", this.getClass().getSimpleName(), printingDataEntity.getId());
         return saveContentParsed(printingDataEntity, getFileProcessorResult(printingDataEntity));

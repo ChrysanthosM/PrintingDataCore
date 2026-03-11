@@ -13,8 +13,8 @@ import javax.xml.transform.Templates;
 public class PdfRendererService {
     private final PdfRendererFactory rendererFactory;
 
-    @Timed("generatePdf")
-    @Counted("generatePdf")
+    @Timed("generate.pdf")
+    @Counted("generate.pdf")
     public byte[] generatePdf(RendererType rendererType, Templates templates, byte[] xml) {
         return rendererFactory.getRenderer(rendererType).generate(templates, xml);
     }
