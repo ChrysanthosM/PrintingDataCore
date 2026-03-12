@@ -2,6 +2,6 @@ package org.masouras.boundary;
 
 import java.io.File;
 
-public interface PrintingDataEntityInitial {
+public interface PrintingDataEntityInitialPersister {
     Long initialPersist(File triggerFile);
 }

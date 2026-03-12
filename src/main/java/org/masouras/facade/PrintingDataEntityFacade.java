@@ -2,7 +2,7 @@ package org.masouras.facade;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.boundary.PrintingDataEntityInitial;
+import org.masouras.boundary.PrintingDataEntityInitialPersister;
 import org.masouras.boundary.PrintingDataEntityProcessor;
 import org.masouras.boundary.PrintingDataEntityValidator;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
@@ -16,7 +16,7 @@ import java.io.File;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PrintingDataEntityFacade implements PrintingDataEntityInitial, PrintingDataEntityValidator, PrintingDataEntityProcessor {
+public class PrintingDataEntityFacade implements PrintingDataEntityInitialPersister, PrintingDataEntityValidator, PrintingDataEntityProcessor {
     private final PrintingDataEntityInitialService printingDataEntityInitialService;
     private final PrintingDataEntityValidateService printingDataEntityValidateService;
     private final PrintingDataEntityProcessService printingDataEntityProcessService;
@@ -43,5 +43,4 @@ public class PrintingDataEntityFacade implements PrintingDataEntityInitial, Prin
     public PrintingDataEntity processPrintingDataEntity(PrintingDataEntity printingDataEntity) {
         return printingDataEntityProcessService.process(printingDataEntity);
     }
-
 }
