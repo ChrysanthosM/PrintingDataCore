@@ -4,7 +4,6 @@ import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.masouras.control.parser.FileProcessor;
 import org.masouras.control.parser.FileProcessorFactory;
 import org.masouras.domain.FileProcessorResult;
@@ -42,7 +41,7 @@ public class PrintingDataEntityProcessService {
         return fileProcessorResult;
     }
 
-    private PrintingDataEntity saveContentParsed(@NonNull PrintingDataEntity printingDataEntity, FileProcessorResult fileProcessorResult) {
+    private PrintingDataEntity saveContentParsed(PrintingDataEntity printingDataEntity, FileProcessorResult fileProcessorResult) {
         return repositoryFacade.saveContentParsed(printingDataEntity, filesFacade.objectToByteArray(fileProcessorResult.getResult()));
     }
 

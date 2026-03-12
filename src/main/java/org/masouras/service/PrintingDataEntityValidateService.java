@@ -4,7 +4,6 @@ import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.masouras.control.parser.FileValidator;
 import org.masouras.control.parser.FileValidatorFactory;
 import org.masouras.domain.FileValidatorResult;
@@ -12,6 +11,7 @@ import org.masouras.exception.ValidationException;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.RepositoryFacade;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
@@ -26,8 +26,9 @@ public class PrintingDataEntityValidateService {
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
 
-    public PrintingDataEntity validate(Long printingDataEntityId) {
+    public PrintingDataEntity validate(Long printingDataEntityId, PrintingWayType checkPrintingWayType) {
         PrintingDataEntity printingDataEntity = repositoryFacade.getPrintingDataEntityById(printingDataEntityId);
+        if (checkPrintingWayType != null && printingDataEntity.getPrintingWayType() != checkPrintingWayType) return printingDataEntity;
         return validate(printingDataEntity);
     }
 
@@ -46,7 +47,7 @@ public class PrintingDataEntityValidateService {
         return fileValidatorResult;
     }
 
-    private PrintingDataEntity saveContentValidated(@NonNull PrintingDataEntity printingDataEntity, FileValidatorResult fileValidatorResult) {
+    private PrintingDataEntity saveContentValidated(PrintingDataEntity printingDataEntity, FileValidatorResult fileValidatorResult) {
         try {
             String stringDocument = filesFacade.documentToString((Document) fileValidatorResult.getResult());
             byte[] bytesDocument = stringDocument.getBytes(StandardCharsets.UTF_8);

@@ -6,6 +6,7 @@ import org.masouras.boundary.PrintingDataEntityInitialPersister;
 import org.masouras.boundary.PrintingDataEntityProcessor;
 import org.masouras.boundary.PrintingDataEntityValidator;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
 import org.masouras.service.PrintingDataEntityInitialService;
 import org.masouras.service.PrintingDataEntityProcessService;
 import org.masouras.service.PrintingDataEntityValidateService;
@@ -27,8 +28,8 @@ public class PrintingDataEntityFacade implements PrintingDataEntityInitialPersis
     }
 
     @Override
-    public PrintingDataEntity validatePrintingDataEntity(Long printingDataEntityId) {
-        return printingDataEntityValidateService.validate(printingDataEntityId);
+    public PrintingDataEntity validatePrintingDataEntity(Long printingDataEntityId, PrintingWayType checkPrintingWayType) {
+        return printingDataEntityValidateService.validate(printingDataEntityId, checkPrintingWayType);
     }
     @Override
     public PrintingDataEntity validatePrintingDataEntity(PrintingDataEntity printingDataEntity) {
