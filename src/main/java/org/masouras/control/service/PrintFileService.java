@@ -9,6 +9,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.print.PrintService;
@@ -60,15 +61,18 @@ public class PrintFileService {
             }
 
             if (StringUtils.isNotBlank(outputPath)) {
-                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-                attr.add(new Destination(Paths.get(outputPath, printingID + ".pdf").toUri()));
-                printerJob.print(attr);
+                exportPdf(printingID, outputPath, printerJob);
                 return;
             }
             printerJob.print();
         } catch (Exception e) {
             log.error("printOrExportPdf failed: {}", e.getMessage(), e);
         }
+    }
+    private void exportPdf(String printingID, @NonNull String outputPath, PrinterJob printerJob) throws PrinterException {
+        PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+        attr.add(new Destination(Paths.get(outputPath, printingID + ".pdf").toUri()));
+        printerJob.print(attr);
     }
 
     public boolean isLikelyPdf(byte[] data) {
