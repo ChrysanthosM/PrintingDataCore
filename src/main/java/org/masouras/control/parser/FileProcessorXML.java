@@ -10,10 +10,7 @@ import org.masouras.control.service.PrintingLetterSetUpService;
 import org.masouras.control.service.XslTemplateService;
 import org.masouras.domain.FileProcessorResult;
 import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ValidFlag;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.*;
 import org.springframework.stereotype.Service;
 
 import javax.xml.transform.Templates;
@@ -57,7 +54,12 @@ public non-sealed class FileProcessorXML implements FileProcessor {
                 .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found for ActivityType: " + activityType + " and ContentType: " + contentType);
 
-        List<byte[]> pdfResultList = implementorList.parallelStream()
+        List<byte[]> pdfResultList = getPdfResultListForValidatedContent(implementorList, validatedContent);
+        return FileProcessorResult.success(pdfResultList);
+    }
+
+    private List<byte[]> getPdfResultListForValidatedContent(List<PrintingLetterSetUpProjectionImplementor> implementorList, byte[] validatedContent) {
+        return implementorList.parallelStream()
                 .filter(implementor -> implementor.getValidFlag() == ValidFlag.ENABLED)
                 .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType().name())))
                 .filter(entry -> entry.getValue() != null)
@@ -70,10 +72,7 @@ public non-sealed class FileProcessorXML implements FileProcessor {
                         }
                 )
                 .toList();
-
-        return FileProcessorResult.success(pdfResultList);
     }
-
     private void logEntry(AbstractMap.SimpleEntry<PrintingLetterSetUpProjectionImplementor, Templates> entry) {
         if (log.isInfoEnabled()) {
             log.info("pdfRendererService will generatePdf with ActivityType: {}, ContentType: {}, XslType: {}, RendererType: {}",
