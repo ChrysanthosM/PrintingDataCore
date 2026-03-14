@@ -1,11 +1,11 @@
 package org.masouras.control.service;
 
-import com.google.common.base.Preconditions;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
@@ -39,34 +39,38 @@ public class PrintFileService {
         printPdf(printingID, pdfBytes, selectedPrinter, null);
     }
     public void printPdf(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(printingID));
-        Preconditions.checkArgument(ArrayUtils.isNotEmpty(pdfBytes), "PDF byte array cannot be empty");
-        Preconditions.checkArgument(isLikelyPdf(pdfBytes), "Provided byte array does not appear to be a valid PDF");
+        Validate.notBlank(printingID);
+        Validate.isTrue(ArrayUtils.isNotEmpty(pdfBytes), "PDF byte array cannot be empty");
+        Validate.isTrue(isLikelyPdf(pdfBytes), "Provided byte array does not appear to be a valid PDF");
         if (log.isInfoEnabled()) log.info("Starting printPdf for printingID {} with PDF byte array of size {}", printingID, pdfBytes.length);
-        printPdfMain(printingID, pdfBytes, selectedPrinter, outputPath);
+        printOrExportPdf(printingID, pdfBytes, selectedPrinter, outputPath);
     }
-    public void printPdfMain(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
+
+    public void printOrExportPdf(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
         try (PDDocument pdDocument = Loader.loadPDF(pdfBytes)) {
             PrinterJob printerJob = PrinterJob.getPrinterJob();
-            printerJob.setJobName("Print pdDocument");
+            printerJob.setJobName("Print pdDocument " + printingID);
             printerJob.setPageable(new PDFPageable(pdDocument));
 
-            if (StringUtils.isNotBlank(selectedPrinter)) {
+            if (StringUtils.isBlank(outputPath) && StringUtils.isNotBlank(selectedPrinter)) {
                 Arrays.stream(PrinterJob.lookupPrintServices())
                         .filter(ps -> ps.getName().equalsIgnoreCase(selectedPrinter))
                         .findFirst()
                         .ifPresent(ps -> setPrintService(selectedPrinter, ps, printerJob));
             }
 
-            PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
             if (StringUtils.isNotBlank(outputPath)) {
+                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
                 attr.add(new Destination(Paths.get(outputPath, printingID + ".pdf").toUri()));
+                printerJob.print(attr);
+                return;
             }
-            printerJob.print(attr);
+            printerJob.print();
         } catch (Exception e) {
-            log.error("printPdf failed with message {}", e.getMessage(), e);
+            log.error("printOrExportPdf failed: {}", e.getMessage(), e);
         }
     }
+
     public boolean isLikelyPdf(byte[] data) {
         if (ArrayUtils.isEmpty(data) || data.length < 8) return false;
 

@@ -1,9 +1,9 @@
 package org.masouras.control.parser;
 
-import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.util.Chars;
 import org.jspecify.annotations.NonNull;
 import org.masouras.domain.FileValidatorResult;
@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +37,8 @@ public non-sealed class FileValidatorXML implements FileValidator {
 
     @Override
     public FileValidatorResult getValidatedResult(Object... params) {
-        Preconditions.checkNotNull(params);
-        Preconditions.checkArgument(params.length >= 1, "validate requires 1 or 2 parameters: fileContent and optionally xsdPath");
+        Objects.requireNonNull(params);
+        Validate.isTrue(params.length >= 1, "validate requires 1 or 2 parameters: fileContent and optionally xsdPath");
 
         byte[] fileContent = (byte[]) params[0];
         if (ArrayUtils.isEmpty(fileContent)) {

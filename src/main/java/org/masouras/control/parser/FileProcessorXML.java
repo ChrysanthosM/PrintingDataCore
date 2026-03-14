@@ -1,10 +1,10 @@
 package org.masouras.control.parser;
 
-import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.Validate;
 import org.masouras.control.render.PdfRendererService;
 import org.masouras.control.service.PrintingLetterSetUpService;
 import org.masouras.control.service.XslTemplateService;
@@ -20,6 +20,7 @@ import javax.xml.transform.Templates;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -36,13 +37,13 @@ public non-sealed class FileProcessorXML implements FileProcessor {
 
     @Override
     public FileProcessorResult getFileProcessorResult(Object... params) {
-        Preconditions.checkNotNull(params);
-        Preconditions.checkArgument(params.length == 3, "processor requires 3 parameters: ActivityType, ContentType and validatedBase64Content");
+        Objects.requireNonNull(params);
+        Validate.isTrue(params.length == 3, "processor requires 3 parameters: ActivityType, ContentType and validatedBase64Content");
 
         ActivityType activityType = (ActivityType) params[0];
-        Preconditions.checkNotNull(activityType, "activityType must not be null");
+        Objects.requireNonNull(activityType, "activityType must not be null");
         ContentType contentType = (ContentType) params[1];
-        Preconditions.checkNotNull(contentType, "contentType must not be null");
+        Objects.requireNonNull(contentType, "contentType must not be null");
         byte[] validatedContent = (byte[]) params[2];
         if (ArrayUtils.isEmpty(validatedContent)) {
             throw new IllegalArgumentException("validatedContent can't be empty");

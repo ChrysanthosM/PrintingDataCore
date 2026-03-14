@@ -1,11 +1,11 @@
 package org.masouras.control.service;
 
-import com.google.common.base.Preconditions;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class XslTemplateService {
     private final Map<String, Templates> xslTemplates = new HashMap<>();
 
     public Templates getTemplate(String xslFileName) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(xslFileName));
+        Validate.notBlank(xslFileName);
         return xslTemplates.get(xslFileName);
     }
 
