@@ -4,20 +4,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.Validate;
+import org.jsoup.helper.Validate;
+import org.jspecify.annotations.NonNull;
+import org.masouras.control.converter.XmlConverterService;
 import org.masouras.control.render.PdfRendererService;
 import org.masouras.control.service.PrintingLetterSetUpService;
 import org.masouras.control.service.XslTemplateService;
 import org.masouras.domain.FileProcessorResult;
+import org.masouras.model.mssql.schema.jpa.control.entity.adapter.domain.LetterToPrintDTO;
 import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.*;
+import org.masouras.util.ChunkUtil;
+import org.masouras.xml.invoices.control.InvoicesControlService;
+import org.masouras.xml.invoices.domain.Invoice;
 import org.springframework.stereotype.Service;
 
 import javax.xml.transform.Templates;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -26,6 +36,8 @@ public non-sealed class FileProcessorXML implements FileProcessor {
     private final PrintingLetterSetUpService printingLetterSetUpService;
     private final PdfRendererService pdfRendererService;
     private final XslTemplateService xslTemplateService;
+    private final XmlConverterService xmlSerializerService;
+    private final InvoicesControlService invoicesControlService;
 
     @Override
     public FileExtensionType getFileExtensionType() {
@@ -34,42 +46,65 @@ public non-sealed class FileProcessorXML implements FileProcessor {
 
     @Override
     public FileProcessorResult getFileProcessorResult(Object... params) {
-        Objects.requireNonNull(params);
-        Validate.isTrue(params.length == 3, "processor requires 3 parameters: ActivityType, ContentType and validatedBase64Content");
+        Object[] validated = ParserParamsValidator.of(4, params)
+                .expect(PrintingWayType.class, ActivityType.class, ContentType.class, byte[].class)
+                .validate();
+        PrintingWayType printingWayType = (PrintingWayType) validated[0];
+        ActivityType activityType = (ActivityType) validated[1];
+        ContentType contentType = (ContentType) validated[2];
+        byte[] validatedContent = (byte[]) validated[3];
+        Validate.isTrue(ArrayUtils.isNotEmpty(validatedContent), "validatedContent must not be null");
 
-        ActivityType activityType = (ActivityType) params[0];
-        Objects.requireNonNull(activityType, "activityType must not be null");
-        ContentType contentType = (ContentType) params[1];
-        Objects.requireNonNull(contentType, "contentType must not be null");
-        byte[] validatedContent = (byte[]) params[2];
-        if (ArrayUtils.isEmpty(validatedContent)) {
-            throw new IllegalArgumentException("validatedContent can't be empty");
-        }
-
-        return getFileProcessorResultMain(activityType, contentType, validatedContent);
-    }
-    private FileProcessorResult getFileProcessorResultMain(ActivityType activityType, ContentType contentType, byte[] validatedContent) {
         List<PrintingLetterSetUpProjectionImplementor> implementorList = printingLetterSetUpService.getPrintingLetterLookUpMap()
                 .getOrDefault(activityType.getCode(), Map.of())
                 .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found for ActivityType: " + activityType + " and ContentType: " + contentType);
+        return getFileProcessorResultMain(printingWayType, implementorList, validatedContent);
+    }
+    private FileProcessorResult getFileProcessorResultMain(PrintingWayType printingWayType, List<PrintingLetterSetUpProjectionImplementor> implementorList,
+                                                           byte[] validatedContent) {
+        return switch (printingWayType) {
+            case ARTEMIS -> getPdfResultListForValidatedContentSimple(implementorList, validatedContent);
+            case BATCH -> getPdfResultListForValidatedContentBatch(implementorList, validatedContent);
+            default -> FileProcessorResult.error("Unknown PrintingWayType: " + printingWayType);
+        };
+    }
 
-        List<byte[]> pdfResultList = getPdfResultListForValidatedContent(implementorList, validatedContent);
+    private @NonNull FileProcessorResult getPdfResultListForValidatedContentBatch(List<PrintingLetterSetUpProjectionImplementor> implementorList, byte[] validatedContent) {
+        List<Invoice> invoicesList = invoicesControlService.getInvoiceList(validatedContent);
+        if (CollectionUtils.isEmpty(invoicesList)) return FileProcessorResult.error("No invoices found in validatedContent");
+        try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
+            List<Future<List<byte[]>>> futureInvoicesList = invoicesList.stream()
+                    .map(invoice -> executorService.submit(() -> getPdfResultListForValidatedContentMain(implementorList, xmlSerializerService.toXmlBytes(invoice))))
+                    .toList();
+            List<byte[]> pdfResultList = futureInvoicesList.stream().flatMap(this::getListFutureOrEmpty).toList();
+            return FileProcessorResult.success(pdfResultList);
+        }
+    }
+    private @NonNull Stream<byte[]> getListFutureOrEmpty(Future<List<byte[]>> listFuture) {
+        try {
+            return listFuture.get().stream();
+        } catch (Exception e) {
+            log.error("Error processing invoice in batch: {}", e.getMessage(), e);
+            return Stream.empty();
+        }
+    }
+
+    private @NonNull FileProcessorResult getPdfResultListForValidatedContentSimple(List<PrintingLetterSetUpProjectionImplementor> implementorList, byte[] validatedContent) {
+        List<byte[]> pdfResultList = getPdfResultListForValidatedContentMain(implementorList, validatedContent);
         return FileProcessorResult.success(pdfResultList);
     }
 
-    private List<byte[]> getPdfResultListForValidatedContent(List<PrintingLetterSetUpProjectionImplementor> implementorList, byte[] validatedContent) {
-        return implementorList.parallelStream()
+    private List<byte[]> getPdfResultListForValidatedContentMain(List<PrintingLetterSetUpProjectionImplementor> implementorList, byte[] validatedContent) {
+        return implementorList.stream()
                 .filter(implementor -> implementor.getValidFlag() == ValidFlag.ENABLED)
                 .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType().name())))
                 .filter(entry -> entry.getValue() != null)
-                .map(entry -> {
-                    logEntry(entry);
-                    return pdfRendererService.generatePdf(
-                                    entry.getKey().getRendererType(),
-                                    entry.getValue(),
-                                    validatedContent);
-                        }
+                .peek(this::logEntry)
+                .map(entry -> pdfRendererService.generatePdf(
+                                entry.getKey().getRendererType(),
+                                entry.getValue(),
+                                validatedContent)
                 )
                 .toList();
     }

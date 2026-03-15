@@ -36,7 +36,11 @@ public class PrintingDataEntityProcessService {
     private FileProcessorResult getFileProcessorResult(PrintingDataEntity printingDataEntity) {
         FileProcessor fileProcessor = fileProcessorFactory.getFileProcessor(printingDataEntity.getFileExtensionType().name());
         if (fileProcessor == null) { throw new ValidationException("Parser failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().name()); }
-        FileProcessorResult fileProcessorResult = fileProcessor.getFileProcessorResult(printingDataEntity.getActivity().getActivityType(), printingDataEntity.getContentType(), printingDataEntity.getValidatedContent().getContentBinary());
+        FileProcessorResult fileProcessorResult = fileProcessor.getFileProcessorResult(
+                printingDataEntity.getPrintingWayType(),
+                printingDataEntity.getActivity().getActivityType(),
+                printingDataEntity.getContentType(),
+                printingDataEntity.getValidatedContent().getContentBinary());
         if (fileProcessorResult.getStatus() == FileProcessorResult.ProcessorStatus.ERROR) throw new ValidationException("Parser failed with message: " + fileProcessorResult.getMessage());
         return fileProcessorResult;
     }

@@ -41,9 +41,7 @@ public non-sealed class FileValidatorXML implements FileValidator {
         Validate.isTrue(params.length >= 1, "validate requires 1 or 2 parameters: fileContent and optionally xsdPath");
 
         byte[] fileContent = (byte[]) params[0];
-        if (ArrayUtils.isEmpty(fileContent)) {
-            throw new IllegalArgumentException("fileContent can't be empty");
-        }
+        Validate.isTrue(ArrayUtils.isNotEmpty(fileContent), "fileContent can't be empty");
 
         String xsdPath = (params.length > 1) ? (String) params[1] : null;
 
