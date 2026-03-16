@@ -11,28 +11,27 @@ import org.masouras.control.render.PdfRendererService;
 import org.masouras.control.service.PrintingLetterSetUpService;
 import org.masouras.control.service.XslTemplateService;
 import org.masouras.domain.FileProcessorResult;
-import org.masouras.model.mssql.schema.jpa.control.entity.adapter.domain.LetterToPrintDTO;
 import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.*;
-import org.masouras.util.ChunkUtil;
 import org.masouras.xml.invoices.control.InvoicesControlService;
 import org.masouras.xml.invoices.domain.Invoice;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.xml.transform.Templates;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public non-sealed class FileProcessorXML implements FileProcessor {
+    @Value("${thread.pool.size:#{1}}") private int threadPoolSize;
+
     private final PrintingLetterSetUpService printingLetterSetUpService;
     private final PdfRendererService pdfRendererService;
     private final XslTemplateService xslTemplateService;
@@ -73,20 +72,28 @@ public non-sealed class FileProcessorXML implements FileProcessor {
     private @NonNull FileProcessorResult getPdfResultListForValidatedContentBatch(List<PrintingLetterSetUpProjectionImplementor> implementorList, byte[] validatedContent) {
         List<Invoice> invoicesList = invoicesControlService.getInvoiceList(validatedContent);
         if (CollectionUtils.isEmpty(invoicesList)) return FileProcessorResult.error("No invoices found in validatedContent");
-        try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
-            List<Future<List<byte[]>>> futureInvoicesList = invoicesList.stream()
-                    .map(invoice -> executorService.submit(() -> getPdfResultListForValidatedContentMain(implementorList, xmlSerializerService.toXmlBytes(invoice))))
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize)) {
+            List<CompletableFuture<List<byte[]>>> futures = invoicesList.stream()
+                    .map(invoice -> CompletableFuture.supplyAsync(() ->
+                                    getPdfResultListForValidatedContentMain(
+                                            implementorList,
+                                            xmlSerializerService.toXmlBytes(invoice)
+                                    ), executor)
+                            .exceptionally(ex -> {
+                                log.error("Error processing invoice in batch: {}", ex.getMessage(), ex);
+                                return List.of();
+                            })
+                    )
                     .toList();
-            List<byte[]> pdfResultList = futureInvoicesList.stream().flatMap(this::getListFutureOrEmpty).toList();
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            List<byte[]> pdfResultList = futures.stream()
+                    .map(CompletableFuture::join)
+                    .flatMap(List::stream)
+                    .toList();
+
             return FileProcessorResult.success(pdfResultList);
-        }
-    }
-    private @NonNull Stream<byte[]> getListFutureOrEmpty(Future<List<byte[]>> listFuture) {
-        try {
-            return listFuture.get().stream();
-        } catch (Exception e) {
-            log.error("Error processing invoice in batch: {}", e.getMessage(), e);
-            return Stream.empty();
         }
     }
 
