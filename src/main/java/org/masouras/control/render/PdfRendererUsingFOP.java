@@ -1,10 +1,8 @@
 package org.masouras.control.render;
 
+import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.FopFactoryBuilder;
-import org.apache.fop.configuration.Configuration;
-import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +30,14 @@ public non-sealed class PdfRendererUsingFOP implements PdfRenderer {
           </renderers>
         </fop>
         """;
+    private static final byte[] FOP_CONFIG_XML_BYTES = FOP_CONFIG_XML.getBytes(StandardCharsets.UTF_8);
+
 
     private final FopFactory fopFactory;
 
     @Autowired
     public PdfRendererUsingFOP() throws Exception {
-        DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-        Configuration cfg = cfgBuilder.build(new ByteArrayInputStream(FOP_CONFIG_XML.getBytes(StandardCharsets.UTF_8)));
-        FopFactoryBuilder builder = new FopFactoryBuilder(new File(".").toURI()).setConfiguration(cfg);
-        this.fopFactory = builder.build();
+        this.fopFactory = FopFactory.newInstance(new File(".").toURI(), new ByteArrayInputStream(FOP_CONFIG_XML_BYTES));
     }
 
     @Override
@@ -53,7 +50,8 @@ public non-sealed class PdfRendererUsingFOP implements PdfRenderer {
         try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(xml);
              ByteArrayOutputStream pdfOut = new ByteArrayOutputStream()) {
 
-            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, fopFactory.newFOUserAgent(), pdfOut);
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfOut);
 
             Transformer transformer = templates.newTransformer();
             transformer.transform(
