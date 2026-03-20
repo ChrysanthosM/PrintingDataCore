@@ -13,12 +13,11 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.print.PrintService;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Destination;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -49,30 +48,29 @@ public class PrintFileService {
 
     public void printOrExportPdf(String printingID, byte[] pdfBytes, @Nullable String selectedPrinter, @Nullable String outputPath) {
         try (PDDocument pdDocument = Loader.loadPDF(pdfBytes)) {
+            if (StringUtils.isNotBlank(outputPath)) {
+                exportPdf(printingID, outputPath, pdDocument);
+                return;
+            }
+
             PrinterJob printerJob = PrinterJob.getPrinterJob();
             printerJob.setJobName("Print pdDocument " + printingID);
             printerJob.setPageable(new PDFPageable(pdDocument));
-
-            if (StringUtils.isBlank(outputPath) && StringUtils.isNotBlank(selectedPrinter)) {
+            if (StringUtils.isNotBlank(selectedPrinter)) {
                 Arrays.stream(PrinterJob.lookupPrintServices())
                         .filter(ps -> ps.getName().equalsIgnoreCase(selectedPrinter))
                         .findFirst()
                         .ifPresent(ps -> setPrintService(selectedPrinter, ps, printerJob));
-            }
-
-            if (StringUtils.isNotBlank(outputPath)) {
-                exportPdf(printingID, outputPath, printerJob);
-                return;
             }
             printerJob.print();
         } catch (Exception e) {
             log.error("printOrExportPdf failed: {}", e.getMessage(), e);
         }
     }
-    private void exportPdf(String printingID, @NonNull String outputPath, PrinterJob printerJob) throws PrinterException {
-        PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-        attr.add(new Destination(Paths.get(outputPath, printingID + ".pdf").toUri()));
-        printerJob.print(attr);
+    private void exportPdf(String printingID, String outputPath, PDDocument pdDocument) throws IOException {
+        Path outputFile = Paths.get(outputPath, printingID + ".pdf");
+        pdDocument.save(outputFile.toFile());
+        if (log.isInfoEnabled()) log.info("PDF exported to {}", outputFile);
     }
 
     public boolean isLikelyPdf(byte[] data) {
