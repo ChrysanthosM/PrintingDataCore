@@ -1,6 +1,7 @@
 package org.masouras.control.render;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -54,12 +55,7 @@ public non-sealed class PdfRendererUsingFOP implements PdfRenderer {
     public byte[] generate(Templates templates, byte[] xml) {
         try (ByteArrayInputStream xmlStream = new ByteArrayInputStream(xml);
              ByteArrayOutputStream pdfOut = new ByteArrayOutputStream()) {
-
-            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-            Fop fop;
-            synchronized (fopFactory) {
-                fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfOut);
-            }
+            Fop fop = getFop(pdfOut);
 
             Transformer transformer = templates.newTransformer();
             transformer.transform(
@@ -70,5 +66,13 @@ public non-sealed class PdfRendererUsingFOP implements PdfRenderer {
         } catch (Exception e) {
             throw new RuntimeException("FOP PDF generation failed", e);
         }
+    }
+    private Fop getFop(ByteArrayOutputStream pdfOut) throws FOPException {
+        FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+        Fop fop;
+        synchronized (fopFactory) {
+            fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfOut);
+        }
+        return fop;
     }
 }
