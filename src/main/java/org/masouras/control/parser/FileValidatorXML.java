@@ -7,7 +7,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.util.Chars;
 import org.jspecify.annotations.NonNull;
 import org.masouras.domain.FileValidatorResult;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.FileExtensionType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;

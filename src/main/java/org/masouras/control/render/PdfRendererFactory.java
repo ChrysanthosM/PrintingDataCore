@@ -2,7 +2,7 @@ package org.masouras.control.render;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

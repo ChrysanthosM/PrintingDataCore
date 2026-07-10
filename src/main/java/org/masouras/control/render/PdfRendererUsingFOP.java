@@ -7,7 +7,7 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.configuration.Configuration;
 import org.apache.xmlgraphics.util.MimeConstants;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.RendererType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

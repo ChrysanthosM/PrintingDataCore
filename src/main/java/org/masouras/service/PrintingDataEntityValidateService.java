@@ -10,8 +10,8 @@ import org.masouras.domain.FileValidatorResult;
 import org.masouras.exception.ValidationException;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.RepositoryFacade;
-import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
+import org.masouras.model.maria.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 

@@ -10,7 +10,7 @@ import org.masouras.domain.FileProcessorResult;
 import org.masouras.exception.ValidationException;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.RepositoryFacade;
-import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.maria.schema.jpa.control.entity.PrintingDataEntity;
 import org.springframework.stereotype.Service;
 
 @Service

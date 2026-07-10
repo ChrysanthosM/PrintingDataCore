@@ -4,8 +4,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.model.mssql.schema.jpa.boundary.PrintingOptionsService;
-import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
+import org.masouras.model.maria.schema.jpa.boundary.PrintingOptionsService;
+import org.masouras.model.maria.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

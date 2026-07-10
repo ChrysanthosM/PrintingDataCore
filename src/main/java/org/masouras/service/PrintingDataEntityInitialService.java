@@ -14,11 +14,11 @@ import org.masouras.domain.TriggerFileDto;
 import org.masouras.domain.TriggerFileRaw;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.RepositoryFacade;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
-import org.masouras.model.mssql.schema.jpa.control.util.EnumUtil;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.ActivityType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.ContentType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.PrintingWayType;
+import org.masouras.model.maria.schema.jpa.control.util.EnumUtil;
 import org.springframework.stereotype.Service;
 
 import java.io.File;

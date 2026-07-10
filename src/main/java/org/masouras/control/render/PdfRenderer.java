@@ -1,6 +1,6 @@
 package org.masouras.control.render;
 
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.RendererType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.RendererType;
 
 import javax.xml.transform.Templates;
 

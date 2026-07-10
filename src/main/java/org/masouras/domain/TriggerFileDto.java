@@ -1,10 +1,10 @@
 package org.masouras.domain;
 
 import lombok.Data;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.ActivityType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.ContentType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.PrintingWayType;
 
 @Data
 public class TriggerFileDto {
